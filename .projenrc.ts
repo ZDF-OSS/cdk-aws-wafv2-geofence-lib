@@ -14,7 +14,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   projenrcTs: true,
   repositoryUrl: 'https://github.com/ayoub.umoru/zdf_waf-geofence.git',
   description: PROJECT_DESCRIPTION,
-  keywords: ['aws', 'cdk', 'awscdk', 'aws-cdk', 'wafv2','aws-waf', 'aws-wafv2', 'geoblock'],
+  keywords: ['aws', 'cdk', 'awscdk', 'aws-cdk', 'wafv2', 'aws-waf', 'aws-wafv2', 'geoblock'],
 
   // deps: [],                /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */

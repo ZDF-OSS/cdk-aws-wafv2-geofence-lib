@@ -1,6 +1,6 @@
 {
-  "name": "zdf_waf-geofence",
-  "description": "cdk-ecr-image-scan-notify is an AWS CDK construct library that notify the slack channel of Amazon ECR image scan results",
+  "name": "cdk-aws-wafv2-geofence-lib",
+  "description": "cdk-aws-wafv2-geofence-lib is an AWS CDK construct library that adds a AWS WAFv2 with GeoBlocking enabled for an AppSync, API Gateway or an ALB.",
   "repository": {
     "type": "git",
     "url": "https://github.com/ayoub.umoru/zdf_waf-geofence.git"
@@ -64,6 +64,10 @@
   },
   "keywords": [
     "aws",
+    "aws-cdk",
+    "aws-waf",
+    "aws-wafv2",
+    "awscdk",
     "cdk",
     "geoblock",
     "wafv2"
