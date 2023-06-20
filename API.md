@@ -1,4 +1,4 @@
-# AWS WAFv2 GeoBlocking CDK Component for Cloud Development Kit (AWS CDK)
+# AWS WAFv2 GeoBlocking CDK construct for Cloud Development Kit (AWS CDK)
 
 
 
@@ -26,7 +26,7 @@ Jump To:
 -------
 ## TL;TR;
 
-Use our component by installing the module and using our component in your code:
+Use our construct by installing the module and using our construct in your code:
 
 ```sh
 npm install cdk-aws-wafv2-geofence-lib
