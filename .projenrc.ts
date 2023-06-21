@@ -13,6 +13,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   name: PROJECT_NAME,
   projenrcTs: true,
   repositoryUrl: 'https://github.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib.git',
+  homepage: 'https://zerodotfive.com',
   description: PROJECT_DESCRIPTION,
   keywords: ['aws', 'cdk', 'awscdk', 'aws-cdk', 'wafv2', 'aws-waf', 'aws-wafv2', 'geoblock'],
 });
