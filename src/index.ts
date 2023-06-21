@@ -4,13 +4,14 @@ import { Construct } from 'constructs';
 export interface ICdkWafGeoLibProps {
   resourceArn: string;
   allowedCountiesToAccessService: Array<string>;
+  priority: number;
+  block: boolean;
 }
 
 export class CdkWafGeoLib extends Construct {
   constructor(scope: Construct, id: string, props: ICdkWafGeoLibProps) {
     super(scope, id);
 
-    // WAF Setup
     const cfnWebACL = new wafv2.CfnWebACL(this, 'WafAcl', {
       defaultAction: {
         allow: {},
@@ -21,13 +22,19 @@ export class CdkWafGeoLib extends Construct {
         metricName: 'WAF',
         sampledRequestsEnabled: true,
       },
-      name: 'zdf-waf-rules',
+      name: 'GeoBlockingWafRules',
+      description: 'This is a WAFv2 web acl that delivers geoblocking for your backends.',
+      tags: [
+        {
+          key: 'cdk-component', value: 'cdk-wafv2-geoblock',
+        },
+      ],
       rules: [
         {
           name: 'GeoBlockage',
-          priority: 1,
+          priority: props.priority,
           action: {
-            block: {},
+            ...props.block ? { block: {} } : { count: {} },
           },
           statement: {
             notStatement: {

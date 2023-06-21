@@ -31,6 +31,9 @@ Use our construct by installing the module and using our construct in your code:
 ```sh
 npm install cdk-aws-wafv2-geofence-lib
 ```
+**allowedCountiesToAccessService** expects an array of two-character country codes that you want to match against, for example, [ "US", "CN" ], from the alpha-2 country ISO codes of the ISO 3166 international standard.
+
+When you use a geo match statement just for the region and country labels that it adds to requests, you still have to supply a country code for the rule to evaluate. In this case, you configure the rule to only count matching requests, but it will still generate logging and count metrics for any matches. You can reduce the logging and metrics that the rule produces by specifying a country that's unlikely to be a source of traffic to your site.  (https://docs.aws.amazon.com/waf/latest/APIReference/API_GeoMatchStatement.html)
 
 ```ts
    // AWS WAFv2 GeoBlocking CDK Component
@@ -177,8 +180,19 @@ export class EcsBpMicroservice extends cdk.Stack {
 }
 ```
 
+## Integration Testing
 
+The integrations test deploys the solution with a microservice and a loadbalancer. The microservice runs inside an ecs cluster.
 
+Deploy the solution for testing
+```ts
+cdk --app='./lib/integ.default.js' deploy
+```
+
+Destroy the solution
+```ts
+cdk --app='./lib/integ.default.js' destroy
+```
 ## Getting Help
 
 The best way to interact with our team is through GitHub or mail. You can open an [issue](https://github.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib/issues/new/choose) and choose from one of our templates for bug reports, feature requests, documentation issues.
@@ -310,6 +324,8 @@ The tree node.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowedCountiesToAccessService">allowedCountiesToAccessService</a></code> | <code>string[]</code> | *No description.* |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.block">block</a></code> | <code>boolean</code> | *No description.* |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.priority">priority</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.resourceArn">resourceArn</a></code> | <code>string</code> | *No description.* |
 
 ---
@@ -321,6 +337,26 @@ public readonly allowedCountiesToAccessService: string[];
 ```
 
 - *Type:* string[]
+
+---
+
+##### `block`<sup>Required</sup> <a name="block" id="cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.block"></a>
+
+```typescript
+public readonly block: boolean;
+```
+
+- *Type:* boolean
+
+---
+
+##### `priority`<sup>Required</sup> <a name="priority" id="cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.priority"></a>
+
+```typescript
+public readonly priority: number;
+```
+
+- *Type:* number
 
 ---
 

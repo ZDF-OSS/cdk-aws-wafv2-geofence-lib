@@ -1,0 +1,316 @@
+{
+  "version": "32.0.0",
+  "artifacts": {
+    "EcsBpMicroserviceWaf.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "EcsBpMicroserviceWaf.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "EcsBpMicroserviceWaf": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "EcsBpMicroserviceWaf.template.json",
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e639df4777f29ac2d2fb088b231d5c2e7595391ac0b14160dd4da7b41aace6f8.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "EcsBpMicroserviceWaf.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "EcsBpMicroserviceWaf.assets"
+      ],
+      "metadata": {
+        "/EcsBpMicroserviceWaf/integ-vpc/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpc115426B5"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet1Subnet3D6DBC80"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet1RouteTable3F825F0C"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet1RouteTableAssociation8E9E7465"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet1DefaultRoute6E6FACEB"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet1/EIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet1EIPE1ABB123"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet1/NATGateway": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet1NATGateway40CD2E70"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet2Subnet6D5EE190"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet2RouteTable05630A9E"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet2RouteTableAssociationFD33CD0F"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet2DefaultRoute94BA7AD9"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet2/EIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet2EIP2114ECA6"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PublicSubnet2/NATGateway": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPublicSubnet2NATGatewayD5455F45"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PrivateSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPrivateSubnet1Subnet977C46DE"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PrivateSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPrivateSubnet1RouteTable8D014434"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PrivateSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPrivateSubnet1RouteTableAssociation985D890E"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PrivateSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPrivateSubnet1DefaultRoute06F2E4BC"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PrivateSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPrivateSubnet2Subnet27BCB194"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PrivateSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPrivateSubnet2RouteTableF119B76D"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PrivateSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPrivateSubnet2RouteTableAssociationC35FC1A4"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/PrivateSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcPrivateSubnet2DefaultRoute6C4DE9ED"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/IGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcIGWE025940C"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-vpc/VPCGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integvpcVPCGW4D09CCCB"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-ecs-cluster/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integecscluster3B3D0FC5"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-td/TaskRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integtdTaskRoleBEA38D8E"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-td/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integtd7F2797CE"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-td/integ-container/LogGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integtdintegcontainerLogGroup4EF70DD4"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-td/ExecutionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integtdExecutionRole0E25582B"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-td/ExecutionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integtdExecutionRoleDefaultPolicy524910C7"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-sg/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integsgB0D60C50"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-sg/from EcsBpMicroserviceWafinteglbSecurityGroup7F113FF2:80": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integsgfromEcsBpMicroserviceWafinteglbSecurityGroup7F113FF28040C746F2"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-service/Service": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integserviceServiceCA084882"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-service/TaskCount/Target/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integserviceTaskCountTargetC4EA67AB"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-service/TaskCount/Target/RequestScaling/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integserviceTaskCountTargetRequestScaling700AB0B6"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-lb/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integlbD793B2E9"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-lb/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integlbSecurityGroup2BD5D913"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-lb/SecurityGroup/to EcsBpMicroserviceWafintegsg9F9D15B6:80": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integlbSecurityGrouptoEcsBpMicroserviceWafintegsg9F9D15B6800C087B28"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-lb/integ-listener/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integlbinteglistener210E4B05"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/integ-lb/integ-listener/integ-targetsGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "integlbinteglistenerintegtargetsGroup54D0D8ED"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/Cdk-Waf-Geo-Lib/WafAcl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CdkWafGeoLibWafAcl34B12DC7"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/Cdk-Waf-Geo-Lib/WAFAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CdkWafGeoLibWAFAssociationCF0B3CAE"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/EcsBpMicroserviceWaf/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "EcsBpMicroserviceWaf"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}
