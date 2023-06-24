@@ -9,7 +9,6 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
     super(scope, id, props);
     const product = 'integ';
 
-
     const vpc = new cdk.aws_ec2.Vpc(this, 'integ-vpc', {
       ipAddresses: cdk.aws_ec2.IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 2,
@@ -18,6 +17,15 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
     const cluster = new cdk.aws_ecs.Cluster(this, 'integ-ecs-cluster', {
       clusterName: 'integ-ecs-cluster',
       vpc: vpc,
+    });
+
+    const task = new cdk.aws_ecs.FargateTaskDefinition(this, 'integ-td', {
+      memoryLimitMiB: 512,
+      cpu: 256,
+      runtimePlatform: {
+        operatingSystemFamily: cdk.aws_ecs.OperatingSystemFamily.LINUX,
+        cpuArchitecture: cdk.aws_ecs.CpuArchitecture.ARM64,
+      },
     });
 
     const imageAsset = new cdk.aws_ecr_assets.DockerImageAsset(
@@ -30,16 +38,6 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
     );
 
     const image = cdk.aws_ecs.ContainerImage.fromDockerImageAsset(imageAsset);
-
-    const task = new cdk.aws_ecs.FargateTaskDefinition(this, 'integ-td', {
-      memoryLimitMiB: 512,
-      cpu: 256,
-      runtimePlatform: {
-        operatingSystemFamily: cdk.aws_ecs.OperatingSystemFamily.LINUX,
-        cpuArchitecture: cdk.aws_ecs.CpuArchitecture.ARM64,
-      },
-    });
-
     task.addContainer('integ-container', {
       containerName: `${product}`,
       image,
@@ -48,6 +46,7 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
         streamPrefix: `${product}`,
       }),
     });
+
     const sg = new cdk.aws_ec2.SecurityGroup(this, 'integ-sg', {
       vpc,
       allowAllOutbound: true,
@@ -67,14 +66,11 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       assignPublicIp: false,
     });
 
-    const lb = new cdk.aws_elasticloadbalancingv2.ApplicationLoadBalancer(
-      this,
-      'integ-lb',
-      {
-        vpc,
-        internetFacing: true,
-        loadBalancerName: 'integ-lb',
-      },
+    const lb = new cdk.aws_elasticloadbalancingv2.ApplicationLoadBalancer(this, 'integ-lb', {
+      vpc,
+      internetFacing: true,
+      loadBalancerName: 'integ-lb',
+    },
     );
 
     const listener = lb.addListener('integ-listener', {
@@ -95,11 +91,13 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       requestsPerTarget: 500,
       targetGroup: tg,
     });
+
     new CdkWafGeoLib(this, 'Cdk-Waf-Geo-Lib', {
       allowedCountiesToAccessService: ['DE'],
       resourceArn: lb.loadBalancerArn,
       block: true,
-      priority: 500,
+      priority: 233,
+      enableCloudWatchLogs: true,
     });
   }
 }

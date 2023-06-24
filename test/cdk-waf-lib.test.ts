@@ -23,7 +23,7 @@ test('Should contain a WebACL ressource with a default action allow.', () => {
     {
       Rules: [
         {
-          Name: 'GeoBlockage',
+          Name: 'WafGeoBlockGreenList',
           Priority: 500,
           Action: {
             Block: {},
@@ -40,7 +40,7 @@ test('Should contain a WebACL ressource with a default action allow.', () => {
           VisibilityConfig: {
             SampledRequestsEnabled: true,
             CloudWatchMetricsEnabled: true,
-            MetricName: 'GeoBlock',
+            MetricName: 'WafGeoBlockGreenList',
           },
         },
       ],

@@ -24,6 +24,14 @@ Jump To:
 [More Resources](#more-resources)
 
 -------
+## New features
+
+* [2023] [Logs] - Added support for CloudWatch Logs als log destination for requests, with a default retention of 1 week
+
+#### Logging
+Enabled logging sends all information to the CloudWatch LogGroup.
+
+-------
 ## TL;TR;
 
 Use our construct by installing the module and using our construct in your code:
@@ -40,8 +48,11 @@ When you use a geo match statement just for the region and country labels that i
     const allowedCountiesToAccessService = ["DE"]
     const geoblockingWaf = new CdkWafGeoLib(this, 'GeoblockingWaf',
     {
-      allowedCountiesToAccessService: allowedCountiesToAccessService,
-      resourceArn: lb.loadBalancerArn
+      allowedCountiesToAccessService: ['DE'],
+      resourceArn: lb.loadBalancerArn,
+      block: true,
+      priority: 105,
+      enableCloudWatchLogs: true
     })
 ```
 ## Getting Started
@@ -51,8 +62,6 @@ Install or update the [AWS CDK CLI] from npm (requires [Node.js ≥ 14.15.0](htt
 ```sh
 npm -g aws-cdk
 ```
-
-(See [Manual Installation](./MANUAL_INSTALLATION.md) for installing the CDK from a signed .zip file).
 
 Initialize a project with our component:
 
@@ -66,45 +75,29 @@ npm install cdk-aws-wafv2-geofence-lib
 This creates a sample project - replace the sample code with:
 
 ```ts
-import * as cdk from "aws-cdk-lib";
-import * as path from "path";
-import { Construct } from "constructs";
-import { Platform } from "aws-cdk-lib/aws-ecr-assets";
-import { CdkWafGeoLib } from "cdk-aws-wafv2-geofence-lib"
+import * as path from 'path';
+import * as cdk from 'aws-cdk-lib';
+import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
+import { Construct } from 'constructs';
+import { CdkWafGeoLib } from './index';
 
-export class EcsBpMicroservice extends cdk.Stack {
+export class EcsBpMicroserviceWaf extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    const product = "bp-micro";
-    
-    const parameterValue = new cdk.CfnParameter(this, "LBName", {
-      type: "String",
-      default: "bp-micro-lb",
-      description: "This is a parameter value.",
-    });
+    const product = 'integ';
 
-    const vpc = new cdk.aws_ec2.Vpc(this, `bp-vpc`, {
-      ipAddresses: cdk.aws_ec2.IpAddresses.cidr("10.0.0.0/16"),
+
+    const vpc = new cdk.aws_ec2.Vpc(this, 'integ-vpc', {
+      ipAddresses: cdk.aws_ec2.IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 2,
     });
 
-    const cluster = new cdk.aws_ecs.Cluster(this, `bp-ecs-cluster`, {
-      clusterName: `ecs-cluster`,
+    const cluster = new cdk.aws_ecs.Cluster(this, 'integ-ecs-cluster', {
+      clusterName: 'integ-ecs-cluster',
       vpc: vpc,
     });
 
-    const imageAsset = new cdk.aws_ecr_assets.DockerImageAsset(
-      this,
-      `bp-image`,
-      {
-        directory: path.join(__dirname, "../../backend"),
-        platform: Platform.LINUX_ARM64,
-      }
-    );
-
-    const image = cdk.aws_ecs.ContainerImage.fromDockerImageAsset(imageAsset);
-
-    const task = new cdk.aws_ecs.FargateTaskDefinition(this, `bp-td`, {
+    const task = new cdk.aws_ecs.FargateTaskDefinition(this, 'integ-td', {
       memoryLimitMiB: 512,
       cpu: 256,
       runtimePlatform: {
@@ -113,7 +106,17 @@ export class EcsBpMicroservice extends cdk.Stack {
       },
     });
 
-    const container = task.addContainer(`bp-container`, {
+    const imageAsset = new cdk.aws_ecr_assets.DockerImageAsset(
+      this,
+      'integ-image',
+      {
+        directory: path.join(__dirname, '../src/backend'),
+        platform: Platform.LINUX_ARM64,
+      },
+    );
+
+    const image = cdk.aws_ecs.ContainerImage.fromDockerImageAsset(imageAsset);
+    task.addContainer('integ-container', {
       containerName: `${product}`,
       image,
       portMappings: [{ containerPort: 80 }],
@@ -121,17 +124,18 @@ export class EcsBpMicroservice extends cdk.Stack {
         streamPrefix: `${product}`,
       }),
     });
-    const sg = new cdk.aws_ec2.SecurityGroup(this, `bp-sg`, {
+
+    const sg = new cdk.aws_ec2.SecurityGroup(this, 'integ-sg', {
       vpc,
       allowAllOutbound: true,
     });
     sg.addIngressRule(
       cdk.aws_ec2.Peer.anyIpv4(),
       cdk.aws_ec2.Port.tcp(808),
-      "Allowing traffic to the backend"
+      'Allowing traffic to the backend',
     );
 
-    const service = new cdk.aws_ecs.FargateService(this, `bp-service`, {
+    const service = new cdk.aws_ecs.FargateService(this, 'integ-service', {
       cluster,
       serviceName: `${product}-service`,
       taskDefinition: task,
@@ -142,20 +146,20 @@ export class EcsBpMicroservice extends cdk.Stack {
 
     const lb = new cdk.aws_elasticloadbalancingv2.ApplicationLoadBalancer(
       this,
-      `bp-lb`,
+      'integ-lb',
       {
         vpc,
         internetFacing: true,
-        loadBalancerName: parameterValue.valueAsString,
-      }
+        loadBalancerName: 'integ-lb',
+      },
     );
 
-    const listener = lb.addListener(`bp-listener`, {
+    const listener = lb.addListener('integ-listener', {
       port: 808,
       protocol: cdk.aws_elasticloadbalancingv2.ApplicationProtocol.HTTP,
     });
 
-    const tg = listener.addTargets(`bp-targets`, {
+    const tg = listener.addTargets('integ-targets', {
       port: 80,
       protocol: cdk.aws_elasticloadbalancingv2.ApplicationProtocol.HTTP,
       targets: [service],
@@ -164,20 +168,20 @@ export class EcsBpMicroservice extends cdk.Stack {
     });
 
     const scaling = service.autoScaleTaskCount({ maxCapacity: 10 });
-    scaling.scaleOnRequestCount("RequestScaling", {
+    scaling.scaleOnRequestCount('RequestScaling', {
       requestsPerTarget: 500,
       targetGroup: tg,
     });
-
-    // AWS WAFv2 GeoBlocking CDK Component
-    const allowedCountiesToAccessService = ["DE"]
-    const geoblockingWaf = new CdkWafGeoLib(this, 'GeoblockingWaf',
-    {
-      allowedCountiesToAccessService: allowedCountiesToAccessService,
-      resourceArn: lb.loadBalancerArn
-    })
+    new CdkWafGeoLib(this, 'Cdk-Waf-Geo-Lib', {
+      allowedCountiesToAccessService: ['US'],
+      resourceArn: lb.loadBalancerArn,
+      block: true,
+      priority: 105,
+      enableCloudWatchLogs: false,
+    });
   }
 }
+
 ```
 
 ## Integration Testing
@@ -193,6 +197,8 @@ Destroy the solution
 ```ts
 cdk --app='./lib/integ.default.js' destroy
 ```
+
+
 ## Getting Help
 
 The best way to interact with our team is through GitHub or mail. You can open an [issue](https://github.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib/issues/new/choose) and choose from one of our templates for bug reports, feature requests, documentation issues.
