@@ -12,9 +12,10 @@ import { WafRuleGeoBlockGreenList } from './components/waf-rule-geoblock';
 export interface ICdkWafGeoLibProps {
   /** Arn of the ressource to protect. */
   resourceArn: string;
+  /** Allowed countries to access the backend - for example DE, EN, DK */
   allowedCountiesToAccessService: Array<string>;
-  allowEUOnly?: boolean;
-  allowAllButWar?: boolean;
+  //allowEUOnly?: boolean;
+  //allowAllButWar?: boolean;
   /** Priority of the WAFv2 rule. */
   priority: number;
   /** Switch to control if the rule should block or count incomming requests. */

@@ -340,12 +340,10 @@ public readonly customResourceResult: string;
 
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowedCountiesToAccessService">allowedCountiesToAccessService</a></code> | <code>string[]</code> | *No description.* |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowedCountiesToAccessService">allowedCountiesToAccessService</a></code> | <code>string[]</code> | Allowed countries to access the backend - for example DE, EN, DK. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.block">block</a></code> | <code>boolean</code> | Switch to control if the rule should block or count incomming requests. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.priority">priority</a></code> | <code>number</code> | Priority of the WAFv2 rule. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.resourceArn">resourceArn</a></code> | <code>string</code> | Arn of the ressource to protect. |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowAllButWar">allowAllButWar</a></code> | <code>boolean</code> | *No description.* |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowEUOnly">allowEUOnly</a></code> | <code>boolean</code> | *No description.* |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.cloudWatchLogGroupName">cloudWatchLogGroupName</a></code> | <code>string</code> | Name of the CloudWatch LogGroup where requests are stored. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableCloudWatchLogs">enableCloudWatchLogs</a></code> | <code>boolean</code> | Sends logs to a CloudWatch LogGroup with a retention on it. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.retentionDays">retentionDays</a></code> | <code>aws-cdk-lib.aws_logs.RetentionDays</code> | Retention period to keep logs. |
@@ -359,6 +357,8 @@ public readonly allowedCountiesToAccessService: string[];
 ```
 
 - *Type:* string[]
+
+Allowed countries to access the backend - for example DE, EN, DK.
 
 ---
 
@@ -395,26 +395,6 @@ public readonly resourceArn: string;
 - *Type:* string
 
 Arn of the ressource to protect.
-
----
-
-##### `allowAllButWar`<sup>Optional</sup> <a name="allowAllButWar" id="cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowAllButWar"></a>
-
-```typescript
-public readonly allowAllButWar: boolean;
-```
-
-- *Type:* boolean
-
----
-
-##### `allowEUOnly`<sup>Optional</sup> <a name="allowEUOnly" id="cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowEUOnly"></a>
-
-```typescript
-public readonly allowEUOnly: boolean;
-```
-
-- *Type:* boolean
 
 ---
 
