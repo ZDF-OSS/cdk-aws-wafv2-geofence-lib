@@ -7,8 +7,9 @@ const stack = new Stack(mockApp);
 new CdkWafGeoLib(stack, 'Cdk-Waf-Geo-Lib', {
   allowedCountiesToAccessService: ['DE', 'EN'],
   resourceArn: 'some-arn',
-  block: true,
   priority: 500,
+  enableGeoBlocking: true,
+  enableAWSManagedRulesBlocking: false,
 });
 const template = Template.fromStack(stack);
 

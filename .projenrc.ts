@@ -2,7 +2,7 @@ import { awscdk } from 'projen';
 
 const PROJECT_NAME = 'cdk-aws-wafv2-geofence-lib';
 const PROJECT_DESCRIPTION =
-  'The cdk-aws-wafv2-geofence-lib is an AWS CDK construct library that adds a AWS WAFv2 with GeoBlocking enabled for an AppSync, API Gateway or an ALB.';
+  'The cdk-aws-wafv2-geofence-lib is an AWS CDK construct library that adds a AWS WAFv2 with GeoBlocking and AWS Managed Rules for AppSync, API Gateway or an ALB.';
 
 const project = new awscdk.AwsCdkConstructLibrary({
   author: 'ZeroDotFive',
@@ -17,6 +17,9 @@ const project = new awscdk.AwsCdkConstructLibrary({
   homepage: 'https://zerodotfive.com',
   description: PROJECT_DESCRIPTION,
   keywords: ['aws', 'cdk', 'awscdk', 'aws-cdk', 'wafv2', 'aws-waf', 'aws-wafv2', 'geoblock'],
+  gitignore: [
+    'cdk.out/',
+  ],
 });
 
 project.addBundledDeps('@types/aws-lambda');

@@ -1,19 +1,31 @@
-# AWS WAFv2 GeoBlocking CDK construct for Cloud Development Kit (AWS CDK)
+# AWS WAFv2 cdk construct for Cloud Development Kit (AWS CDK)
 
 
 
-The WAFv2 GeoBlocking construct is free for everyone to use. It supports blocking of requests to AWS ressources based on IP orign (Country).
+The WAFv2 construct is free for everyone to use and it leverages the massive improvements made by AWS compared to V1. 
 
-It offers a high-level abstraction and integrates neatly with your existing AWS CDK project. It encapsulates AWS best practices in your
-infrastructure definition and hides boilerplate logic for your.
+**Add an extra layer of security to protect your services from common attacks**
+
+It offers a high-level abstraction and integrates neatly with your existing AWS CDK project. It brings AWS best practices into your infrastructure and hides boilerplate logic in your project.
 
 The Construct is available in the following languages:
 
 * JavaScript, TypeScript ([Node.js ≥ 14.15.0](https://nodejs.org/download/release/latest-v14.x/))
   * We recommend using a version in [Active LTS](https://nodejs.org/en/about/releases/)
 
-
 Third-party Language Deprecation: language version is only supported until its EOL (End Of Life) shared by the vendor or community and is subject to change with prior notice.
+
+**Features**
+* Blocking of requests to your AWS ressources based on IP orign (Country) - If you application is national, restrict the web traffic to the county.
+
+* AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic (https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html)
+
+
+***AWS Managed Rules***
+AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic. You have the option of selecting one or more rule groups from AWS Managed Rules for each web ACL, up to the maximum web ACL capacity unit (WCU) limit.
+
+
+
 
 \
 Jump To:
@@ -46,14 +58,18 @@ When you use a geo match statement just for the region and country labels that i
 ```ts
    // AWS WAFv2 GeoBlocking CDK Component
     const allowedCountiesToAccessService = ["DE"]
-    const geoblockingWaf = new CdkWafGeoLib(this, 'GeoblockingWaf',
-    {
-      allowedCountiesToAccessService: ['DE'],
+    new CdkWafGeoLib(this, 'Cdk-Waf-Geo-Lib', {
+      // Geo blocking
+      allowedCountiesToAccessService: allowedCountiesToAccessService,
+      enableGeoBlocking: false,
+      // AWS Default WAF Rules
+      enableAWSManagedRulesBlocking: true,
+      enableAWSManagedRuleCRS: true,
+
+      priority: 100,
       resourceArn: lb.loadBalancerArn,
-      block: true,
-      priority: 105,
-      enableCloudWatchLogs: true
-    })
+      enableCloudWatchLogs: true,
+    });
 ```
 
 #### Properties <a name="Properties" id="Properties"></a>
@@ -186,12 +202,17 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       requestsPerTarget: 500,
       targetGroup: tg,
     });
+    
     new CdkWafGeoLib(this, 'Cdk-Waf-Geo-Lib', {
-      allowedCountiesToAccessService: ['US'],
+      // Geo blocking
+      allowedCountiesToAccessService: ['DE'],
+      enableGeoBlocking: false,
       resourceArn: lb.loadBalancerArn,
-      block: true,
-      priority: 105,
-      enableCloudWatchLogs: false,
+      priority: 233,
+      enableCloudWatchLogs: true,
+      // AWS Default WAF Rules
+      enableAWSManagedRulesBlocking: true,
+      enableAWSManagedRuleCRS: true,
     });
   }
 }
