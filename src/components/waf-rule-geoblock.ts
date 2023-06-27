@@ -1,11 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
 
 export interface IWafRuleProps {
-  /** If you define more than one Rule in a WebACL , AWS WAF evaluates each request against the Rules in order based on the value of Priority . AWS WAF processes rules with lower priority first. The priorities don’t need to be consecutive, but they must all be different. */
+  /** If you enable more than one Rule, AWS WAF evaluates each request against the Rules in order based on the value of Priority . AWS WAF processes rules with lower priority first. The priorities don’t need to be consecutive, but they must all be different. */
   priority: number;
-
-  /** Instructs AWS WAF to count the web request and then continue evaluating the request using the remaining rules in the web ACL. Link: http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-wafv2-webacl-ruleaction.html#cfn-wafv2-webacl-ruleaction-count */
-  count: boolean;
 
   /** Instructs AWS WAF to block the web request. Link: http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-wafv2-webacl-ruleaction.html#cfn-wafv2-webacl-ruleaction-block */
   block: boolean;
@@ -15,67 +12,46 @@ export interface IWafRuleProps {
   allowed_countries: Array<string>;
 }
 
-export class WafRuleGeoBlockGreenList
-implements cdk.aws_wafv2.CfnWebACL.RuleProperty, IWafRuleProps {
-  allowed_countries: string[];
-  count: boolean;
+export class WafRulesGeoBlock implements IWafRuleProps {
   block: boolean;
-  action?:
-  | cdk.aws_wafv2.CfnWebACL.RuleActionProperty
-  | cdk.IResolvable
-  | undefined;
-  captchaConfig?:
-  | cdk.IResolvable
-  | cdk.aws_wafv2.CfnWebACL.CaptchaConfigProperty
-  | undefined;
-  challengeConfig?:
-  | cdk.IResolvable
-  | cdk.aws_wafv2.CfnWebACL.ChallengeConfigProperty
-  | undefined;
-  name: string;
-  overrideAction?:
-  | cdk.IResolvable
-  | cdk.aws_wafv2.CfnWebACL.OverrideActionProperty
-  | undefined;
   priority: number;
-  ruleLabels?:
-  | cdk.IResolvable
-  | (cdk.IResolvable | cdk.aws_wafv2.CfnWebACL.LabelProperty)[]
-  | undefined;
-  statement: cdk.IResolvable | cdk.aws_wafv2.CfnWebACL.StatementProperty;
-  visibilityConfig:
-  | cdk.IResolvable
-  | cdk.aws_wafv2.CfnWebACL.VisibilityConfigProperty;
+
+  waf_rule: cdk.aws_wafv2.CfnWebACL.RuleProperty;
+
+  allowed_countries: string[];
 
   constructor(props: IWafRuleProps) {
-    this.name = 'WafGeoBlockGreenList';
-    if (props.block) {
-      this.block = true;
-      this.action = {
-        block: {},
-      };
-    } else {
-      this.action = {
-        count: {},
-      };
-    }
-    this.block = props.block;
-    this.allowed_countries = props.allowed_countries;
     this.priority = props.priority;
-    this.count = props.count;
-    this.visibilityConfig = {
-      sampledRequestsEnabled: true,
-      cloudWatchMetricsEnabled: true,
-      metricName: 'WafGeoBlockGreenList',
-    };
-    this.statement = {
-      notStatement: {
-        statement: {
-          geoMatchStatement: {
-            countryCodes: props.allowed_countries,
+    this.allowed_countries = props.allowed_countries;
+    this.block = props.block;
+
+    this.waf_rule = {
+      name: 'WafGeoBlockGreenList',
+      priority: this.priority,
+      action: {
+        ...(this.block ? {
+          block: {
+          },
+        } : { count: {} }),
+      },
+      statement: {
+        notStatement: {
+          statement: {
+            geoMatchStatement: {
+              countryCodes: props.allowed_countries,
+            },
           },
         },
       },
+      visibilityConfig: {
+        sampledRequestsEnabled: true,
+        cloudWatchMetricsEnabled: true,
+        metricName: 'WafGeoBlockGreenList',
+      },
     };
+  }
+
+  public rule(): cdk.aws_wafv2.CfnWebACL.RuleProperty {
+    return this.waf_rule;
   }
 }

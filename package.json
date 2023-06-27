@@ -1,6 +1,6 @@
 {
   "name": "cdk-aws-wafv2-geofence-lib",
-  "description": "The cdk-aws-wafv2-geofence-lib is an AWS CDK construct library that adds a AWS WAFv2 with GeoBlocking enabled for an AppSync, API Gateway or an ALB.",
+  "description": "The cdk-aws-wafv2-geofence-lib is an AWS CDK construct library that adds a AWS WAFv2 with GeoBlocking and AWS Managed Rules for AppSync, API Gateway or an ALB.",
   "repository": {
     "type": "git",
     "url": "https://github.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib.git"

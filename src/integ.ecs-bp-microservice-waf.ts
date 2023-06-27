@@ -93,11 +93,15 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
     });
 
     new CdkWafGeoLib(this, 'Cdk-Waf-Geo-Lib', {
+      // Geo blocking
       allowedCountiesToAccessService: ['DE'],
+      enableGeoBlocking: false,
       resourceArn: lb.loadBalancerArn,
-      block: true,
       priority: 233,
       enableCloudWatchLogs: true,
+      // AWS Default WAF Rules
+      enableAWSManagedRulesBlocking: true,
+      enableAWSManagedRuleCRS: true,
     });
   }
 }
