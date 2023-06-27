@@ -158,7 +158,7 @@ export class CdkWafGeoLib extends Construct {
         runtime: cdk.aws_lambda.Runtime.NODEJS_16_X,
         handler: 'onEvent',
         role: customResourceRole,
-        entry: path.join(__dirname, '../src/handler/event_handler.ts'),
+        entry: path.join(__dirname, '../lib/handler/event_handler.js'),
         bundling: {
           minify: true,
           externalModules: ['aws-sdk', 'aws-lambda'],
