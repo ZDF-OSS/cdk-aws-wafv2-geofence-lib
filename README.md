@@ -90,7 +90,8 @@ When you use a geo match statement just for the region and country labels that i
 Install or update the [AWS CDK CLI] from npm (requires [Node.js ≥ 14.15.0](https://nodejs.org/download/release/latest-v14.x/)). We recommend using a version in [Active LTS](https://nodejs.org/en/about/releases/) and then install the component
 
 ```sh
-npm -g aws-cdk
+npm install -g aws-cdk
+npm install aws-cdk-lib   
 ```
 
 Initialize a project with our component:
