@@ -15,6 +15,9 @@ The Construct is available in the following languages:
 
 Third-party Language Deprecation: language version is only supported until its EOL (End Of Life) shared by the vendor or community and is subject to change with prior notice.
 
+![architecture](/assets/architecture.png)
+
+
 **Features**
 * Blocking of requests to your AWS ressources based on IP orign (Country) - If you application is national, restrict the web traffic to the county.
 
@@ -36,9 +39,7 @@ Jump To:
 [More Resources](#more-resources)
 
 -------
-## New features
 
-* [2023] [Logs] - Added support for CloudWatch Logs als log destination for requests, with a default retention of 1 week
 
 #### Logging
 Enabled logging sends all information to the CloudWatch LogGroup.
