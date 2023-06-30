@@ -6,6 +6,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
+import { CloudWatchWAFDashboard } from './components/dashboard';
 import { WafRulesGeoBlock } from './components/waf-rule-geoblock';
 import { WafRulesManagedBuilder } from './components/waf-rule-managed';
 
@@ -21,7 +22,7 @@ export interface ICdkWafGeoLibProps {
   priority: number;
   /** Deprecated: -  use enableGeoBlocking Switch to control if the rule should block or count incomming requests. */
   block?: boolean;
-  /** Sends logs to a CloudWatch LogGroup with a retention on it. */
+  /** Sends logs to a CloudWatch LogGroup with a retention on it. If enabled you also get a CloudWatch Dashboard.*/
   enableCloudWatchLogs?: boolean;
   /** Name of the CloudWatch LogGroup where requests are stored. */
   cloudWatchLogGroupName?: string;
@@ -54,8 +55,8 @@ export interface ICdkWafGeoLibProps {
   enableAWSMangedRulePHPProtect?: boolean;
   /** The WordPress application rule group contains rules that block request patterns associated with the exploitation of vulnerabilities specific to WordPress sites. You should evaluate this rule group if you are running WordPress. This rule group should be used in conjunction with the SQL database and PHP application rule groups. */
   enableAWSMangedRuleWorkpressProtect?: boolean;
-
 }
+
 export class CdkWafGeoLib extends Construct {
   public readonly customResourceResult?: string;
   constructor(scope: Construct, id: string, props: ICdkWafGeoLibProps) {
@@ -185,12 +186,14 @@ export class CdkWafGeoLib extends Construct {
           },
         },
       );
+
       this.customResourceResult = customResourceResult.getAttString('Result');
       new wafv2.CfnWebACLAssociation(this, 'WAFAssociation', {
         resourceArn: props.resourceArn,
         webAclArn: cfnWebACL.attrArn,
       });
       // END
+      new CloudWatchWAFDashboard(this, 'waf-cloudwatch-dashboard', { cloudwatchLogName: log_group.logGroupName });
     }
   }
 }
