@@ -8,6 +8,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   author: 'ZeroDotFive',
   authorAddress: 'ayoub.umoru@zerodotfive.com',
   cdkVersion: '2.84.0',
+  majorVersion: 1,
   defaultReleaseBranch: 'main',
   authorOrganization: true,
   jsiiVersion: '~5.0.0',

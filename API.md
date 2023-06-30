@@ -25,6 +25,12 @@ Third-party Language Deprecation: language version is only supported until its E
 
 * AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic (https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html)
 
+* Cloud Watch Dashboards with AWS Logs Insights
+
+
+
+![dashboard](/assets/dashboard.png)
+
 
 ***AWS Managed Rules***
 AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic. You have the option of selecting one or more rule groups from AWS Managed Rules for each web ACL, up to the maximum web ACL capacity unit (WCU) limit.
@@ -71,6 +77,7 @@ When you use a geo match statement just for the region and country labels that i
 
       priority: 100,
       resourceArn: lb.loadBalancerArn,
+      // Switching on CloudWatch Logs also provisions a CloudWatch Dashboard
       enableCloudWatchLogs: true,
     });
 ```
@@ -649,6 +656,8 @@ public readonly enableCloudWatchLogs: boolean;
 - *Type:* boolean
 
 Sends logs to a CloudWatch LogGroup with a retention on it.
+
+If enabled you also get a CloudWatch Dashboard.
 
 ---
 
