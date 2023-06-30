@@ -1,5 +1,7 @@
-# AWS WAFv2 cdk construct for Cloud Development Kit (AWS CDK)
+![npm](https://img.shields.io/npm/dw/cdk-aws-wafv2-geofence-lib) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/ZDF-OSS/cdk-aws-wafv2-geofence-lib/main) ![GitHub issues](https://img.shields.io/github/issues/ZDF-OSS/cdk-aws-wafv2-geofence-lib)
 
+
+# AWS WAFv2 cdk construct for Cloud Development Kit (AWS CDK)
 
 
 The WAFv2 construct is free for everyone to use and it leverages the massive improvements made by AWS compared to V1. 
