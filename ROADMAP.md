@@ -8,4 +8,9 @@ The roadmap lets developers know about our upcoming features and priorities to h
 
 We know that our customers are making decisions and plans based on what we are developing. With this we do our best to give an outlook what can be expected next
 
-* **Feature switches for rules** we will add all OOB rules together with our custom rules and let customers toggle them on or off.
+**implemented**
+ * **Feature switches for rules** we will add all OOB rules together with our custom rules and let customers toggle them on or off. 
+
+
+**open**
+* **Rate limits** configurable rate limits for requests by IP
