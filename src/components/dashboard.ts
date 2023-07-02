@@ -76,21 +76,7 @@ export class CloudWatchWAFDashboard extends Construct {
     });
 
     const blockedAgents = new LogQueryWidget({
-      title: 'Top 30 Blocked User-Agents',
-      height: 8,
-      width: 12,
-      logGroupNames: [props.cloudwatchLogName],
-      view: LogQueryVisualizationType.TABLE,
-      queryLines: [
-        'fields @timestamp, @message',
-        'parse @message /(?i)"name":"user-agent","value":"(?<httpRequestUserAgent>[^"]+)/',
-        'filter action == "ALLOW"',
-        'stats count() as count by httpRequestUserAgent as UserAgent',
-        'sort by count desc',
-      ],
-    });
-    const allowedAgents = new LogQueryWidget({
-      title: 'Top 30 Allowed User-Agents',
+      title: 'Top Blocked User-Agents',
       height: 8,
       width: 12,
       logGroupNames: [props.cloudwatchLogName],
@@ -99,6 +85,20 @@ export class CloudWatchWAFDashboard extends Construct {
         'fields @timestamp, @message',
         'parse @message /(?i)"name":"user-agent","value":"(?<httpRequestUserAgent>[^"]+)/',
         'filter action == "BLOCK"',
+        'stats count() as count by httpRequestUserAgent as UserAgent',
+        'sort by count desc',
+      ],
+    });
+    const allowedAgents = new LogQueryWidget({
+      title: 'Top Allowed User-Agents',
+      height: 8,
+      width: 12,
+      logGroupNames: [props.cloudwatchLogName],
+      view: LogQueryVisualizationType.TABLE,
+      queryLines: [
+        'fields @timestamp, @message',
+        'parse @message /(?i)"name":"user-agent","value":"(?<httpRequestUserAgent>[^"]+)/',
+        'filter action == "ALLOW"',
         'stats count() as count by httpRequestUserAgent as UserAgent',
         'sort by count desc',
       ],

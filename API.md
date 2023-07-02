@@ -17,7 +17,7 @@ The Construct is available in the following languages:
 
 Third-party Language Deprecation: language version is only supported until its EOL (End Of Life) shared by the vendor or community and is subject to change with prior notice.
 
-![architecture](/assets/architecture.png)
+![architecture](https://raw.githubusercontent.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib/HEAD/assets/architecture.png)
 
 
 **Features**
@@ -29,7 +29,7 @@ Third-party Language Deprecation: language version is only supported until its E
 
 
 
-![dashboard](/assets/dashboard.png)
+![dashboard](https://raw.githubusercontent.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib/HEAD/assets/dashboard.png)
 
 
 ***AWS Managed Rules***
