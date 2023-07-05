@@ -26,7 +26,7 @@ export interface ICdkWafGeoLibProps {
   enableCloudWatchLogs?: boolean;
   /** Name of the CloudWatch LogGroup where requests are stored. */
   cloudWatchLogGroupName?: string;
-  /** Retention period to keep logs. */
+  /** Retention period to keep logs. ONE_MONTH is default. */
   retentionDays?: RetentionDays;
 
   /** Switch to control if the rule should block or count incomming requests. */
@@ -61,6 +61,8 @@ export class CdkWafGeoLib extends Construct {
   public readonly customResourceResult?: string;
   constructor(scope: Construct, id: string, props: ICdkWafGeoLibProps) {
     super(scope, id);
+    const logRetention = props.retentionDays ?? RetentionDays.ONE_MONTH;
+    const logGroupName = `aws-waf-logs-geo-${props.cloudWatchLogGroupName ?? 'default'}`;
 
     const wafGeoBlocking = new WafRulesGeoBlock( {
       block: ( props.block || props.enableGeoBlocking),
@@ -119,9 +121,9 @@ export class CdkWafGeoLib extends Construct {
       });
 
       const log_group = new cdk.aws_logs.LogGroup(this, 'waf-log-group', {
-        retention: cdk.aws_logs.RetentionDays.ONE_WEEK,
+        retention: logRetention,
         removalPolicy: cdk.RemovalPolicy.DESTROY,
-        logGroupName: `aws-waf-logs-geo-${props.cloudWatchLogGroupName ?? 'default'}`,
+        logGroupName,
       });
 
       customResourceRole.addToPolicy(new PolicyStatement({

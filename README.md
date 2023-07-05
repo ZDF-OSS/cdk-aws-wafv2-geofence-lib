@@ -58,11 +58,17 @@ Enabled logging sends all information to the CloudWatch LogGroup.
 Use our construct by installing the module and using our construct in your code:
 
 ```sh
+npm install -g aws-cdk
+npm install aws-cdk-lib 
 npm install cdk-aws-wafv2-geofence-lib
 ```
 **allowedCountiesToAccessService** expects an array of two-character country codes that you want to match against, for example, [ "US", "CN" ], from the alpha-2 country ISO codes of the ISO 3166 international standard.
 
 When you use a geo match statement just for the region and country labels that it adds to requests, you still have to supply a country code for the rule to evaluate. In this case, you configure the rule to only count matching requests, but it will still generate logging and count metrics for any matches. You can reduce the logging and metrics that the rule produces by specifying a country that's unlikely to be a source of traffic to your site.  (https://docs.aws.amazon.com/waf/latest/APIReference/API_GeoMatchStatement.html)
+
+```ts
+  import { CdkWafGeoLib } from 'cdk-aws-wafv2-geofence-lib'
+```
 
 ```ts
    // AWS WAFv2 GeoBlocking CDK Component
