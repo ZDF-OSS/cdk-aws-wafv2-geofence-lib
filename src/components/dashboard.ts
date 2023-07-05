@@ -11,16 +11,14 @@ export interface IDashboardProps {
 export class CloudWatchWAFDashboard extends Construct {
   constructor(scope: Construct, id: string, props: IDashboardProps) {
     super(scope, id);
-
+    const logGroup = logs.LogGroup.fromLogGroupName(
+      this,
+      'log-group-insight-import',
+      props.cloudwatchLogName,
+    );
     new logs.QueryDefinition(this, 'waf-qd-allowed-requests', {
       queryDefinitionName: 'Allowed requests by country',
-      logGroups: [
-        logs.LogGroup.fromLogGroupName(
-          this,
-          'log-group-blocked',
-          props.cloudwatchLogName,
-        ),
-      ],
+      logGroups: [logGroup],
       queryString: new logs.QueryString({
         stats: 'count(*) as countries by httpRequest.country',
         filterStatements: ['action = "ALLOW"'],
@@ -28,13 +26,7 @@ export class CloudWatchWAFDashboard extends Construct {
     });
     new logs.QueryDefinition(this, 'waf-qd-blocked-requests', {
       queryDefinitionName: 'Blocked requests by country',
-      logGroups: [
-        logs.LogGroup.fromLogGroupName(
-          this,
-          'log-group-allowed',
-          props.cloudwatchLogName,
-        ),
-      ],
+      logGroups: [logGroup],
       queryString: new logs.QueryString({
         stats: 'count(*) as countries by httpRequest.country',
         filterStatements: ['action = "BLOCK"'],
@@ -42,13 +34,7 @@ export class CloudWatchWAFDashboard extends Construct {
     });
     new logs.QueryDefinition(this, 'waf-qd-blocked-ips', {
       queryDefinitionName: 'Blocked IPs by country',
-      logGroups: [
-        logs.LogGroup.fromLogGroupName(
-          this,
-          'log-group-allowed',
-          props.cloudwatchLogName,
-        ),
-      ],
+      logGroups: [logGroup],
       queryString: new logs.QueryString({
         stats: 'stats count(*) as IPs by httpRequest.clientIp, httpRequest.country',
         filterStatements: ['action = "BLOCK"'],
@@ -56,13 +42,7 @@ export class CloudWatchWAFDashboard extends Construct {
     });
     new logs.QueryDefinition(this, 'waf-qd-allowed-ips', {
       queryDefinitionName: 'Allowed IPs by country',
-      logGroups: [
-        logs.LogGroup.fromLogGroupName(
-          this,
-          'log-group-allowed',
-          props.cloudwatchLogName,
-        ),
-      ],
+      logGroups: [logGroup],
       queryString: new logs.QueryString({
         stats: 'stats count(*) as IPs by httpRequest.clientIp, httpRequest.country',
         filterStatements: ['action = "ALLOW"'],
