@@ -37,7 +37,35 @@ export class CloudWatchWAFDashboard extends Construct {
       ],
       queryString: new logs.QueryString({
         stats: 'count(*) as countries by httpRequest.country',
-        filterStatements: ['action = "BLOCKED"'],
+        filterStatements: ['action = "BLOCK"'],
+      }),
+    });
+    new logs.QueryDefinition(this, 'waf-qd-blocked-ips', {
+      queryDefinitionName: 'Blocked IPs by country',
+      logGroups: [
+        logs.LogGroup.fromLogGroupName(
+          this,
+          'log-group-allowed',
+          props.cloudwatchLogName,
+        ),
+      ],
+      queryString: new logs.QueryString({
+        stats: 'stats count(*) as IPs by httpRequest.clientIp, httpRequest.country',
+        filterStatements: ['action = "BLOCK"'],
+      }),
+    });
+    new logs.QueryDefinition(this, 'waf-qd-allowed-ips', {
+      queryDefinitionName: 'Allowed IPs by country',
+      logGroups: [
+        logs.LogGroup.fromLogGroupName(
+          this,
+          'log-group-allowed',
+          props.cloudwatchLogName,
+        ),
+      ],
+      queryString: new logs.QueryString({
+        stats: 'stats count(*) as IPs by httpRequest.clientIp, httpRequest.country',
+        filterStatements: ['action = "ALLOW"'],
       }),
     });
 
