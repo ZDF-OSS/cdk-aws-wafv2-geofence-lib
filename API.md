@@ -10,6 +10,18 @@ The WAFv2 construct is free for everyone to use and it leverages the massive imp
 
 It offers a high-level abstraction and integrates neatly with your existing AWS CDK project. It brings AWS best practices into your infrastructure and hides boilerplate logic in your project.
 
+**Features**
+* Blocking of requests to your AWS ressources based on IP orign (Country) - If you application is national, restrict the web traffic to the county.
+
+* AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic (https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html)
+
+* Cloud Watch Dashboards with AWS Logs Insights
+
+**Experimental**
+* ChatGPT IP blocking engine. IP Block list is maintained by ChatGPT evaluation.
+
+
+
 The Construct is available in the following languages:
 
 * JavaScript, TypeScript ([Node.js ≥ 14.15.0](https://nodejs.org/download/release/latest-v14.x/))
@@ -20,12 +32,7 @@ Third-party Language Deprecation: language version is only supported until its E
 ![architecture](https://raw.githubusercontent.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib/HEAD/assets/architecture.png)
 
 
-**Features**
-* Blocking of requests to your AWS ressources based on IP orign (Country) - If you application is national, restrict the web traffic to the county.
 
-* AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic (https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html)
-
-* Cloud Watch Dashboards with AWS Logs Insights
 
 
 
@@ -75,16 +82,24 @@ When you use a geo match statement just for the region and country labels that i
     const allowedCountiesToAccessService = ["DE"]
     new CdkWafGeoLib(this, 'Cdk-Waf-Geo-Lib', {
       // Geo blocking
-      allowedCountiesToAccessService: allowedCountiesToAccessService,
+      allowedCountiesToAccessService: ['DE'],
       enableGeoBlocking: false,
+
+      resourceArn: lb.loadBalancerArn,
+      priority: 233,
+
+      // Cloud watch logs need to be enabled, if you want Dashboards and if you want to try the ChatGPT exp feature.
+      enableCloudWatchLogs: true,
+
       // AWS Default WAF Rules
       enableAWSManagedRulesBlocking: true,
+      // There are more AWS Managed rules to enable availible...
       enableAWSManagedRuleCRS: true,
 
-      priority: 100,
-      resourceArn: lb.loadBalancerArn,
-      // Switching on CloudWatch Logs also provisions a CloudWatch Dashboard
-      enableCloudWatchLogs: true,
+      //ChatGPT blocking switch - dont forget to set the API Key in Secrets Manager after provisioning.
+      enableChatGPTBlocking: true,
+      //Deploys the ChatGPT looging infrastructure. Dont toggle it of, if you want to keep your data.
+      deployChatGPTBlocking: true,
     });
 ```
 
@@ -230,6 +245,9 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       // AWS Default WAF Rules
       enableAWSManagedRulesBlocking: true,
       enableAWSManagedRuleCRS: true,
+      //ChatGPT
+      enableChatGPTBlocking: true,
+      deployChatGPTBlocking: true,
     });
   }
 }
@@ -393,7 +411,9 @@ public readonly customResourceResult: string;
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowedCountiesToAccessService">allowedCountiesToAccessService</a></code> | <code>string[]</code> | Allowed countries to access the backend - for example DE, EN, DK. |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.deployChatGPTBlocking">deployChatGPTBlocking</a></code> | <code>boolean</code> | Switch to control if the rule should let ChatGPT block or count incomming requests. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSManagedRulesBlocking">enableAWSManagedRulesBlocking</a></code> | <code>boolean</code> | Switch to control if the rule should block or count incomming requests hitting the AWS Manged Rules. |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableChatGPTBlocking">enableChatGPTBlocking</a></code> | <code>boolean</code> | Deploy ChatGPT blocking infrastructure e.g. DynamoDB, Lambdas, CW Rules. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableGeoBlocking">enableGeoBlocking</a></code> | <code>boolean</code> | Switch to control if the rule should block or count incomming requests. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.priority">priority</a></code> | <code>number</code> | Priority of the WAFv2 rule. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.resourceArn">resourceArn</a></code> | <code>string</code> | Arn of the ressource to protect. |
@@ -427,6 +447,18 @@ Allowed countries to access the backend - for example DE, EN, DK.
 
 ---
 
+##### `deployChatGPTBlocking`<sup>Required</sup> <a name="deployChatGPTBlocking" id="cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.deployChatGPTBlocking"></a>
+
+```typescript
+public readonly deployChatGPTBlocking: boolean;
+```
+
+- *Type:* boolean
+
+Switch to control if the rule should let ChatGPT block or count incomming requests.
+
+---
+
 ##### `enableAWSManagedRulesBlocking`<sup>Required</sup> <a name="enableAWSManagedRulesBlocking" id="cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSManagedRulesBlocking"></a>
 
 ```typescript
@@ -436,6 +468,18 @@ public readonly enableAWSManagedRulesBlocking: boolean;
 - *Type:* boolean
 
 Switch to control if the rule should block or count incomming requests hitting the AWS Manged Rules.
+
+---
+
+##### `enableChatGPTBlocking`<sup>Required</sup> <a name="enableChatGPTBlocking" id="cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableChatGPTBlocking"></a>
+
+```typescript
+public readonly enableChatGPTBlocking: boolean;
+```
+
+- *Type:* boolean
+
+Deploy ChatGPT blocking infrastructure e.g. DynamoDB, Lambdas, CW Rules.
 
 ---
 

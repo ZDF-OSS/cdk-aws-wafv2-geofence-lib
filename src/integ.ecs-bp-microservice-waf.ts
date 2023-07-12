@@ -12,6 +12,7 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
     const vpc = new cdk.aws_ec2.Vpc(this, 'integ-vpc', {
       ipAddresses: cdk.aws_ec2.IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 2,
+      natGateways: 0,
     });
 
     const cluster = new cdk.aws_ecs.Cluster(this, 'integ-ecs-cluster', {
@@ -102,6 +103,9 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       // AWS Default WAF Rules
       enableAWSManagedRulesBlocking: true,
       enableAWSManagedRuleCRS: true,
+      //ChatGPT
+      enableChatGPTBlocking: true,
+      deployChatGPTBlocking: true,
     });
   }
 }

@@ -6,6 +6,9 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
+import { AutoBlock } from './components//autoblock';
+import { ChatGPTWafLogEvaluation } from './components/chatgpt-waf-log-evaluation';
+import { ChatGPTWafLogProcessor } from './components/chatgpt-waf-log-processor';
 import { CloudWatchWAFDashboard } from './components/dashboard';
 import { WafRulesGeoBlock } from './components/waf-rule-geoblock';
 import { WafRulesManagedBuilder } from './components/waf-rule-managed';
@@ -31,6 +34,10 @@ export interface ICdkWafGeoLibProps {
 
   /** Switch to control if the rule should block or count incomming requests. */
   enableGeoBlocking: boolean;
+  /** Switch to control if the rule should let ChatGPT block or count incomming requests. */
+  deployChatGPTBlocking: boolean;
+  /** Deploy ChatGPT blocking infrastructure e.g. DynamoDB, Lambdas, CW Rules. */
+  enableChatGPTBlocking: boolean;
   /** Switch to control if the rule should block or count incomming requests hitting the AWS Manged Rules. */
   enableAWSManagedRulesBlocking: boolean;
   /** The Core rule set (CRS) rule group contains rules that are generally applicable to web applications. This provides protection against exploitation of a wide range of vulnerabilities, including some of the high risk and commonly occurring vulnerabilities described in OWASP publications such as OWASP Top 10. Consider using this rule group for any AWS WAF use case. */
@@ -63,12 +70,22 @@ export class CdkWafGeoLib extends Construct {
     super(scope, id);
     const logRetention = props.retentionDays ?? RetentionDays.ONE_MONTH;
     const logGroupName = `aws-waf-logs-geo-${props.cloudWatchLogGroupName ?? 'default'}`;
+    const wafRules: Array<wafv2.CfnWebACL.RuleProperty> = [];
 
-    const wafGeoBlocking = new WafRulesGeoBlock( {
-      block: ( props.block || props.enableGeoBlocking),
-      priority: props.priority,
-      allowed_countries: props.allowedCountiesToAccessService,
-    }).rule();
+    if (props.enableGeoBlocking) {
+      const wafGeoBlocking = new WafRulesGeoBlock( {
+        block: ( props.block || props.enableGeoBlocking),
+        priority: props.priority,
+        allowed_countries: props.allowedCountiesToAccessService,
+      }).rule();
+      wafRules.push(wafGeoBlocking);
+    }
+
+    const log_group = new cdk.aws_logs.LogGroup(this, 'waf-log-group', {
+      retention: logRetention,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      logGroupName,
+    });
 
     const awsManagedRules = new WafRulesManagedBuilder(
       {
@@ -86,6 +103,32 @@ export class CdkWafGeoLib extends Construct {
         windowsProtectionEnabled: props.enableAWSMangedRuleWindowsProtect,
         wordpressProtectionEnabled: props.enableAWSMangedRuleWorkpressProtect,
       }).rules();
+    wafRules.push(...awsManagedRules);
+
+    if (props.enableCloudWatchLogs && props.deployChatGPTBlocking) {
+      const chatGPTBlocker = new AutoBlock(this, 'autoblocker', {
+        block: true,
+        priority: 1,
+        rule_scope: 'REGIONAL',
+      });
+      wafRules.push(chatGPTBlocker.waf_rule);
+
+      const logEvaluation = new ChatGPTWafLogEvaluation(this, 'waf-chatgpt-evaluation-component', {
+        rule_scope: 'REGIONAL',
+        log_group: log_group.logGroupName,
+        chatgpt_log_check_intervall_minutes: 10,
+      });
+      new ChatGPTWafLogProcessor(this, 'waf-chatgpt-processor-component', {
+        rule_scope: 'REGIONAL',
+        dynamo_db_name: logEvaluation.table_name,
+        ip_set_name: chatGPTBlocker.ip_set_name,
+        chatgpt_log_process_intervall_minutes: 12,
+      });
+    }
+
+    if ((props.enableCloudWatchLogs == false) && (props.deployChatGPTBlocking)) {
+      throw ('Cannot deploy ChatGPT logging without enabling cloud watch logs.');
+    }
 
     const cfnWebACL = new wafv2.CfnWebACL(this, 'WafAcl', {
       defaultAction: {
@@ -105,8 +148,7 @@ export class CdkWafGeoLib extends Construct {
         },
       ],
       rules: [
-        wafGeoBlocking,
-        ...awsManagedRules,
+        ...wafRules,
       ],
     });
 
@@ -120,11 +162,6 @@ export class CdkWafGeoLib extends Construct {
         ],
       });
 
-      const log_group = new cdk.aws_logs.LogGroup(this, 'waf-log-group', {
-        retention: logRetention,
-        removalPolicy: cdk.RemovalPolicy.DESTROY,
-        logGroupName,
-      });
 
       customResourceRole.addToPolicy(new PolicyStatement({
         resources: ['*'],

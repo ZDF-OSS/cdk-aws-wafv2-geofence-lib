@@ -24,5 +24,6 @@ const project = new awscdk.AwsCdkConstructLibrary({
 });
 
 project.addBundledDeps('@types/aws-lambda');
+project.addBundledDeps('@aws-cdk/aws-lambda-python-alpha');
 project.addBundledDeps('aws-sdk');
 project.synth();

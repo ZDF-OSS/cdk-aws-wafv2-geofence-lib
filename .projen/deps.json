@@ -104,6 +104,10 @@
       "type": "build"
     },
     {
+      "name": "@aws-cdk/aws-lambda-python-alpha",
+      "type": "bundled"
+    },
+    {
       "name": "@types/aws-lambda",
       "type": "bundled"
     },
