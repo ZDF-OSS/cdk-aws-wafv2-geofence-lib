@@ -15,6 +15,7 @@ export interface IChatGPTWafLogEvaluationProps {
   rule_scope: string;
   log_group: string;
   chatgpt_log_check_intervall_minutes: number;
+  notification_sns_arn: string;
 }
 
 export class ChatGPTWafLogEvaluation extends Construct {
@@ -52,6 +53,7 @@ export class ChatGPTWafLogEvaluation extends Construct {
       },
     );
 
+
     const chatGPTAPISecret = new cdk.aws_secretsmanager.Secret(
       this,
       'waf-chatgpt-secret',
@@ -66,6 +68,14 @@ export class ChatGPTWafLogEvaluation extends Construct {
         actions: ['logs:*'],
       }),
     );
+    if (props.notification_sns_arn) {
+      waf_log_checker_lambda_role.addToPolicy(
+        new iam.PolicyStatement({
+          resources: [props.notification_sns_arn],
+          actions: ['sns:Publish'],
+        }),
+      );
+    }
     const waf_log_analysis_lambda = new PythonFunction(
       this,
       'waf-log-check-lambda',
@@ -86,6 +96,7 @@ export class ChatGPTWafLogEvaluation extends Construct {
           DB_NAME: table.tableName,
           SCOPE: this.rule_scope,
           LOG_GROUP: this.log_group,
+          SNS_ARN: props.notification_sns_arn,
           SECRET_ID: chatGPTAPISecret.secretName,
           LAST_LOG_MINUTES: this.chatgpt_log_check_intervall_minutes.toString(),
         },

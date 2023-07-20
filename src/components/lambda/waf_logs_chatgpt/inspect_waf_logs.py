@@ -9,7 +9,6 @@ logs = boto3.client("logs")
 cw = boto3.client("cloudwatch")
 dynamodb = boto3.client('dynamodb')
 sm = boto3.client('secretsmanager')
-
 # CONFIG
 PRODUCT = os.getenv("PRODUCT")
 DB_NAME = os.getenv("DB_NAME")
@@ -17,6 +16,7 @@ SECRET_ID = os.getenv("SECRET_ID")
 SCOPE = os.getenv("SCOPE")
 LOG_GROUP = os.getenv("LOG_GROUP")
 LAST_LOG_MINUTES = os.getenv("LAST_LOG_MINUTES")
+SNS_ARN = os.environ.get("SNS_ARN", '')
 
 client = boto3.client('secretsmanager')
 openai.api_key = sm.get_secret_value(
@@ -32,6 +32,7 @@ class Item():
     comment: str
     last_updated: str
     created: str
+    request: str
 
 
 def create_item(item: Item):
@@ -44,7 +45,8 @@ def create_item(item: Item):
             'product': {'S': item.product},
             'comment': {'S': item.comment},
             'last_updated': {'S': current_time},
-            'created': {'S': current_time}
+            'created': {'S': current_time},
+            'request': {'S': item.request}
         }
     )
 
@@ -63,7 +65,8 @@ def get_item(ip: str, product: str):
             product=item['product']['S'],
             comment=item['comment']['S'],
             last_updated=item['last_updated']['S'],
-            created=item['created']['S']
+            created=item['created']['S'],
+            request=item['request']['S']
         )
     else:
         return None
@@ -79,7 +82,8 @@ def update_item(item: Item):
         ExpressionAttributeValues={
             ':p': {'S': item.product},
             ':c': {'S': item.comment},
-            ':lu': {'S': current_time}
+            ':lu': {'S': current_time},
+            ':r': {'S': item.request}
         }
     )
 
@@ -186,11 +190,38 @@ def GetCallsFromIP(ip):
 
 
 def AskChatGPTAboutTheUris(uris):
-    question = f"""Can this requests to my web app be part of an attack? Give an brief explanation and respond with #YES# or #NO# if this should be blocked. The web app is a FastAPI. These are the uri calls: {uris}"""
+    question = f"""Can this requests to my web app be part of an attack? Give an brief explanation and respond with #YES# or #NO# if this should be blocked. These are the uri calls: {uris}"""
 
     print(f"Checking: {uris}")
     answer = ask_chatgpt(question)
     return answer
+
+
+def make_message(item: Item):
+    message = f"""🛑 URGENT: IP Added to BLOCKLIST 🛑
+
+🔒 IP Address: {item.ip}
+🌐 URL Call: {item.request}
+🚫 Reason: {item.comment}"""
+    return message
+
+
+def send_sns(message: str):
+    """
+    Send an SNS message to the specified topic.
+    """
+    if SNS_ARN == "":
+        return
+
+    sns_client = boto3.client('sns')
+
+    topic_arn = SNS_ARN
+    response = sns_client.publish(
+        TopicArn=topic_arn,
+        Message=message
+    )
+
+    return response
 
 
 def CheckAlreadyProcessedIPs(input_ips):
@@ -200,7 +231,12 @@ def CheckAlreadyProcessedIPs(input_ips):
     return delta
 
 
-def ProcessChatGPTAnswer(answer: str, ip_involved: str):
+def block(item: Item):
+    create_item(item)
+    send_sns(message=make_message(item))
+
+
+def ProcessChatGPTAnswer(answer: str, ip_involved: str, request: str):
     print(f"The ip {ip_involved}")
     answer = answer.strip()
     if "#YES#" in answer:
@@ -208,8 +244,8 @@ def ProcessChatGPTAnswer(answer: str, ip_involved: str):
         print("Should be blocked.")
         if not get_item(ip=ip_involved, product=PRODUCT):
             item = Item(ip=ip_involved, product=PRODUCT,
-                        comment=answer, last_updated=datetime.now().isoformat(), created=datetime.now().isoformat())
-            create_item(item)
+                        comment=answer, last_updated=datetime.now().isoformat(), created=datetime.now().isoformat(), request=request)
+            block(item=item)
 
     elif "#NO#" in answer:
         answer = answer.replace("#NO#", '')
@@ -227,7 +263,7 @@ def handler(event, context):
             if calls_from_ip:
                 chatgpt_answer = AskChatGPTAboutTheUris(calls_from_ip)
                 ProcessChatGPTAnswer(answer=chatgpt_answer,
-                                     ip_involved=ip)
+                                     ip_involved=ip, request=''.join(calls_from_ip))
 
 
 if __name__ == '__main__':

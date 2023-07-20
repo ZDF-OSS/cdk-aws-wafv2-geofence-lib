@@ -6,6 +6,7 @@ import os
 
 waf = boto3.client('wafv2')
 dynamodb = boto3.client('dynamodb')
+sns = None
 
 # CONFIG
 IP_SET_NAME = os.getenv("IP_SET_NAME")
