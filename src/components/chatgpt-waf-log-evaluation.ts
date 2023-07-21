@@ -1,5 +1,3 @@
-
-import { PythonFunction } from '@aws-cdk/aws-lambda-python-alpha';
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
@@ -8,7 +6,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 //import * as logs from 'aws-cdk-lib/aws-logs'
 //import * as cw from 'aws-cdk-lib/aws-cloudwatch'
-import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
+//import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
 export interface IChatGPTWafLogEvaluationProps {
@@ -76,33 +74,36 @@ export class ChatGPTWafLogEvaluation extends Construct {
         }),
       );
     }
-    const waf_log_analysis_lambda = new PythonFunction(
-      this,
-      'waf-log-check-lambda',
-      {
-        entry: './src/components/lambda/waf_logs_chatgpt/',
-        runtime: new lambda.Runtime(
-          Runtime.PYTHON_3_10.name,
-          lambda.RuntimeFamily.PYTHON,
-        ),
-        role: waf_log_checker_lambda_role,
-        description:
-            'Reads WAFv2 logs, makes ChatGPT evaluations and stores the results DynamoDB.',
-        index: 'inspect_waf_logs.py',
-        architecture: Architecture.ARM_64,
-        handler: 'handler',
-        environment: {
-          PRODUCT: 'ChatGPTBadIPs',
-          DB_NAME: table.tableName,
-          SCOPE: this.rule_scope,
-          LOG_GROUP: this.log_group,
-          SNS_ARN: props.notification_sns_arn,
-          SECRET_ID: chatGPTAPISecret.secretName,
-          LAST_LOG_MINUTES: this.chatgpt_log_check_intervall_minutes.toString(),
-        },
-        timeout: cdk.Duration.minutes(6),
+
+    /*
+    const lambdaLayer = new lambda.LayerVersion(this, 'waf-log-check-layer', {
+      code: lambda.Code.fromAsset('./src/components/lambda/log_analytics_layer_layer.zip'),
+      compatibleRuntimes: [lambda.Runtime.PYTHON_3_10], // Adjust this based on your Lambda runtime
+      description: 'Python dependencies layer',
+    });*/
+
+    const waf_log_analysis_lambda = new lambda.Function(this, 'waf-log-check-lambda', {
+      runtime: lambda.Runtime.PYTHON_3_10,
+      code: lambda.Code.fromAsset('./src/components/lambda/log_analytics.zip', {
+      }),
+      handler: 'inspect_waf_logs.handler',
+      role: waf_log_checker_lambda_role,
+      architecture: lambda.Architecture.ARM_64,
+      //layers: [lambdaLayer],
+      description:
+          'Reads WAFv2 logs, makes ChatGPT evaluations and stores the results DynamoDB.',
+      environment: {
+        PRODUCT: 'ChatGPTBadIPs',
+        DB_NAME: table.tableName,
+        SCOPE: this.rule_scope,
+        LOG_GROUP: this.log_group,
+        SNS_ARN: props.notification_sns_arn,
+        SECRET_ID: chatGPTAPISecret.secretName,
+        LAST_LOG_MINUTES: this.chatgpt_log_check_intervall_minutes.toString(),
       },
-    );
+      timeout: cdk.Duration.minutes(6),
+    });
+
     chatGPTAPISecret.grantRead(waf_log_analysis_lambda);
     table.grantWriteData(waf_log_analysis_lambda);
     table.grantReadData(waf_log_analysis_lambda);

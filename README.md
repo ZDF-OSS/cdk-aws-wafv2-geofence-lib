@@ -19,8 +19,12 @@ It offers a high-level abstraction and integrates neatly with your existing AWS 
   
 **Experimental**
 * ChatGPT IP blocking engine. IP Block list is maintained by ChatGPT evaluation.
+* Support for Slack notifications
 
+***Notifications***
+If ChatGPT functionality is enabled, you can also pass a sns_topic to the construct. This will enable ChatGPT block notifications to Slack. Use our integration example to get going from: https://github.com/ZDF-OSS/aws-slack-notifications after you have deployed the stack, you get the sns topic and pass it to the construct (snsNotificationArn).
 
+![dashboard](assets/slack.png)
 
 The Construct is available in the following languages:
 
@@ -35,12 +39,15 @@ Third-party Language Deprecation: language version is only supported until its E
 
   
 
+## Dashbord
 
 ![dashboard](https://raw.githubusercontent.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib/HEAD/assets/dashboard.png)
 
 
+
 ***AWS Managed Rules***
 AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic. You have the option of selecting one or more rule groups from AWS Managed Rules for each web ACL, up to the maximum web ACL capacity unit (WCU) limit.
+
 
 
 
@@ -100,6 +107,9 @@ When you use a geo match statement just for the region and country labels that i
       enableChatGPTBlocking: true,
       //Deploys the ChatGPT looging infrastructure. Dont toggle it of, if you want to keep your data.
       deployChatGPTBlocking: true,
+
+      //If using ChatGPT - you can also enable notifications too. Feel free to use our cdk example on how to implement Slack Notifications. https://github.com/ZDF-OSS/aws-slack-notifications
+      snsNotificationArn: 'arn:aws:sns:eu-central-1:326941568664:notifications-to-channel',
     });
 ```
 
@@ -254,7 +264,7 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       allowedCountiesToAccessService: ['DE'],
       enableGeoBlocking: false,
       resourceArn: lb.loadBalancerArn,
-      priority: 233,
+      priority: 100,
       enableCloudWatchLogs: true,
       // AWS Default WAF Rules
       enableAWSManagedRulesBlocking: true,
@@ -262,6 +272,8 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       //ChatGPT
       enableChatGPTBlocking: true,
       deployChatGPTBlocking: true,
+      //If using ChatGPT - you can also enable notifications too. Feel free to use our cdk example on how to implement Slack Notifications. https://github.com/ZDF-OSS/aws-slack-notifications
+      snsNotificationArn: 'arn:aws:sns:eu-central-1:326941568664:notifications-to-channel',
     });
   }
 }
