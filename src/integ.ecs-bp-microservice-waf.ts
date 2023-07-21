@@ -12,11 +12,13 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
     const vpc = new cdk.aws_ec2.Vpc(this, 'integ-vpc', {
       ipAddresses: cdk.aws_ec2.IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 2,
+      natGateways: 0,
     });
 
     const cluster = new cdk.aws_ecs.Cluster(this, 'integ-ecs-cluster', {
       clusterName: 'integ-ecs-cluster',
       vpc: vpc,
+      containerInsights: true,
     });
 
     const task = new cdk.aws_ecs.FargateTaskDefinition(this, 'integ-td', {
@@ -59,11 +61,14 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
 
     const service = new cdk.aws_ecs.FargateService(this, 'integ-service', {
       cluster,
+      circuitBreaker: { rollback: true },
       serviceName: `${product}-service`,
       taskDefinition: task,
       securityGroups: [sg],
+      vpcSubnets: { subnetType: cdk.aws_ec2.SubnetType.PUBLIC },
       desiredCount: 1,
-      assignPublicIp: false,
+      assignPublicIp: true,
+      healthCheckGracePeriod: cdk.Duration.seconds(10),
     });
 
     const lb = new cdk.aws_elasticloadbalancingv2.ApplicationLoadBalancer(this, 'integ-lb', {
@@ -102,6 +107,12 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       // AWS Default WAF Rules
       enableAWSManagedRulesBlocking: true,
       enableAWSManagedRuleCRS: true,
+      //ChatGPT
+      enableChatGPTBlocking: true,
+      deployChatGPTBlocking: true,
+
+      //Notifications
+      snsNotificationArn: 'arn:aws:sns:eu-central-1:126941568664:notifications-to-channel',
     });
   }
 }

@@ -10,6 +10,22 @@ The WAFv2 construct is free for everyone to use and it leverages the massive imp
 
 It offers a high-level abstraction and integrates neatly with your existing AWS CDK project. It brings AWS best practices into your infrastructure and hides boilerplate logic in your project.
 
+**Features**
+* Blocking of requests to your AWS ressources based on IP orign (Country) - If you application is national, restrict the web traffic to the county.
+
+* AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic (https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html)
+
+* Cloud Watch Dashboards with AWS Logs Insights
+  
+**Experimental**
+* ChatGPT IP blocking engine. IP Block list is maintained by ChatGPT evaluation.
+* Support for Slack notifications
+
+***Notifications***
+If ChatGPT functionality is enabled, you can also pass a sns_topic to the construct. This will enable ChatGPT block notifications to Slack. Use our integration example to get going from: https://github.com/ZDF-OSS/aws-slack-notifications after you have deployed the stack, you get the sns topic and pass it to the construct (snsNotificationArn).
+
+![dashboard](assets/slack.png)
+
 The Construct is available in the following languages:
 
 * JavaScript, TypeScript ([Node.js ≥ 14.15.0](https://nodejs.org/download/release/latest-v14.x/))
@@ -20,20 +36,18 @@ Third-party Language Deprecation: language version is only supported until its E
 ![architecture](https://raw.githubusercontent.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib/HEAD/assets/architecture.png)
 
 
-**Features**
-* Blocking of requests to your AWS ressources based on IP orign (Country) - If you application is national, restrict the web traffic to the county.
 
-* AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic (https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html)
-
-* Cloud Watch Dashboards with AWS Logs Insights
   
 
+## Dashbord
 
 ![dashboard](https://raw.githubusercontent.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib/HEAD/assets/dashboard.png)
 
 
+
 ***AWS Managed Rules***
 AWS Managed Rules for AWS WAF is a managed service that provides protection against common application vulnerabilities or other unwanted traffic. You have the option of selecting one or more rule groups from AWS Managed Rules for each web ACL, up to the maximum web ACL capacity unit (WCU) limit.
+
 
 
 
@@ -75,31 +89,56 @@ When you use a geo match statement just for the region and country labels that i
     const allowedCountiesToAccessService = ["DE"]
     new CdkWafGeoLib(this, 'Cdk-Waf-Geo-Lib', {
       // Geo blocking
-      allowedCountiesToAccessService: allowedCountiesToAccessService,
+      allowedCountiesToAccessService: ['DE'],
       enableGeoBlocking: false,
+
+      resourceArn: lb.loadBalancerArn,
+      priority: 233,
+
+      // Cloud watch logs need to be enabled, if you want Dashboards and if you want to try the ChatGPT exp feature.
+      enableCloudWatchLogs: true,
+
       // AWS Default WAF Rules
       enableAWSManagedRulesBlocking: true,
+      // There are more AWS Managed rules to enable availible...
       enableAWSManagedRuleCRS: true,
 
-      priority: 100,
-      resourceArn: lb.loadBalancerArn,
-      // Switching on CloudWatch Logs also provisions a CloudWatch Dashboard
-      enableCloudWatchLogs: true,
+      //ChatGPT blocking switch - dont forget to set the API Key in Secrets Manager after provisioning.// Get your API key from https://platform.openai.com/account/api-keys
+      enableChatGPTBlocking: true,
+      //Deploys the ChatGPT looging infrastructure. Dont toggle it of, if you want to keep your data.
+      deployChatGPTBlocking: true,
+
+      //If using ChatGPT - you can also enable notifications too. Feel free to use our cdk example on how to implement Slack Notifications. https://github.com/ZDF-OSS/aws-slack-notifications
+      snsNotificationArn: 'arn:aws:sns:eu-central-1:326941568664:notifications-to-channel',
     });
 ```
 
 #### Properties <a name="Properties" id="Properties"></a>
 
-| **Name**                                                                                                                                         | **Type**                                        | **Description**                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- | ----------------------------------------------------------------------- |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowedCountiesToAccessService">allowedCountiesToAccessService</a></code> | <code>string[]</code>                           | Allowed countries to access the backend - for example DE, EN, DK.       |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.block">block</a></code>                                                   | <code>boolean</code>                            | Switch to control if the rule should block or count incomming requests. |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.priority">priority</a></code>                                             | <code>number</code>                             | Priority of the WAFv2 rule.                                             |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.resourceArn">resourceArn</a></code>                                       | <code>string</code>                             | Arn of the ressource to protect.                                        |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.cloudWatchLogGroupName">cloudWatchLogGroupName</a></code>                 | <code>string</code>                             | Name of the CloudWatch LogGroup where requests are stored.              |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableCloudWatchLogs">enableCloudWatchLogs</a></code>                     | <code>boolean</code>                            | Sends logs to a CloudWatch LogGroup with a retention on it.             |
-| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.retentionDays">retentionDays</a></code>                                   | <code>aws-cdk-lib.aws_logs.RetentionDays</code> | Retention period to keep logs.                                          |
-
+| **Name**                                                                                                                                                   | **Type**                                        | **Description**                                                                                                                                                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.allowedCountiesToAccessService">allowedCountiesToAccessService</a></code>           | <code>string[]</code>                           | Allowed countries to access the backend - for example DE, EN, DK.                                                                                                                                                                      |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.deployChatGPTBlocking">deployChatGPTBlocking</a></code>                             | <code>boolean</code>                            | Switch to control if the rule should let ChatGPT block or count incomming requests.                                                                                                                                                    |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSManagedRulesBlocking">enableAWSManagedRulesBlocking</a></code>             | <code>boolean</code>                            | Switch to control if the rule should block or count incomming requests hitting the AWS Manged Rules.                                                                                                                                   |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableChatGPTBlocking">enableChatGPTBlocking</a></code>                             | <code>boolean</code>                            | Deploy ChatGPT blocking infrastructure e.g. DynamoDB, Lambdas, CW Rules.                                                                                                                                                               |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableGeoBlocking">enableGeoBlocking</a></code>                                     | <code>boolean</code>                            | Switch to control if the rule should block or count incomming requests.                                                                                                                                                                |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.priority">priority</a></code>                                                       | <code>number</code>                             | Priority of the WAFv2 rule.                                                                                                                                                                                                            |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.resourceArn">resourceArn</a></code>                                                 | <code>string</code>                             | Arn of the ressource to protect.                                                                                                                                                                                                       |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.block">block</a></code>                                                             | <code>boolean</code>                            | Deprecated: -  use enableGeoBlocking Switch to control if the rule should block or count incomming requests.                                                                                                                           |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.cloudWatchLogGroupName">cloudWatchLogGroupName</a></code>                           | <code>string</code>                             | Name of the CloudWatch LogGroup where requests are stored.                                                                                                                                                                             |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSManagedRuleCRS">enableAWSManagedRuleCRS</a></code>                         | <code>boolean</code>                            | The Core rule set (CRS) rule group contains rules that are generally applicable to web applications.                                                                                                                                   |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleAdminProtect">enableAWSMangedRuleAdminProtect</a></code>         | <code>boolean</code>                            | The Admin protection rule group contains rules that allow you to block external access to exposed administrative pages.                                                                                                                |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleAnonIP">enableAWSMangedRuleAnonIP</a></code>                     | <code>boolean</code>                            | The Anonymous IP list rule group contains rules to block requests from services that permit the obfuscation of viewer identity.                                                                                                        |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleIPRep">enableAWSMangedRuleIPRep</a></code>                       | <code>boolean</code>                            | The Amazon IP reputation list rule group contains rules that are based on Amazon internal threat intelligence.                                                                                                                         |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleKBI">enableAWSMangedRuleKBI</a></code>                           | <code>boolean</code>                            | The Known bad inputs rule group contains rules to block request patterns that are known to be invalid and are associated with exploitation or discovery of vulnerabilities.                                                            |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleLinuxProtect">enableAWSMangedRuleLinuxProtect</a></code>         | <code>boolean</code>                            | The Linux operating system rule group contains rules that block request patterns associated with the exploitation of vulnerabilities specific to Linux, including Linux-specific Local File Inclusion (LFI) attacks.                   |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRulePHPProtect">enableAWSMangedRulePHPProtect</a></code>             | <code>boolean</code>                            | The PHP application rule group contains rules that block request patterns associated with the exploitation of vulnerabilities specific to the use of the PHP programming language, including injection of unsafe PHP functions.        |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleSQLi">enableAWSMangedRuleSQLi</a></code>                         | <code>boolean</code>                            | The SQL database rule group contains rules to block request patterns associated with exploitation of SQL databases, like SQL injection attacks.                                                                                        |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleUnixProtect">enableAWSMangedRuleUnixProtect</a></code>           | <code>boolean</code>                            | The POSIX operating system rule group contains rules that block request patterns associated with the exploitation of vulnerabilities specific to POSIX and POSIX-like operating systems, including Local File Inclusion (LFI) attacks. |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleWindowsProtect">enableAWSMangedRuleWindowsProtect</a></code>     | <code>boolean</code>                            | The Windows operating system rule group contains rules that block request patterns associated with the exploitation of vulnerabilities specific to Windows, like remote execution of PowerShell commands.                              |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSMangedRuleWorkpressProtect">enableAWSMangedRuleWorkpressProtect</a></code> | <code>boolean</code>                            | The WordPress application rule group contains rules that block request patterns associated with the exploitation of vulnerabilities specific to WordPress sites.                                                                       |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableCloudWatchLogs">enableCloudWatchLogs</a></code>                               | <code>boolean</code>                            | Sends logs to a CloudWatch LogGroup with a retention on it.                                                                                                                                                                            |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.retentionDays">retentionDays</a></code>                                             | <code>aws-cdk-lib.aws_logs.RetentionDays</code> | Retention period to keep logs.                                                                                                                                                                                                         |
 ---
 ## Getting Started
 
@@ -225,11 +264,16 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       allowedCountiesToAccessService: ['DE'],
       enableGeoBlocking: false,
       resourceArn: lb.loadBalancerArn,
-      priority: 233,
+      priority: 100,
       enableCloudWatchLogs: true,
       // AWS Default WAF Rules
       enableAWSManagedRulesBlocking: true,
       enableAWSManagedRuleCRS: true,
+      //ChatGPT
+      enableChatGPTBlocking: true,
+      deployChatGPTBlocking: true,
+      //If using ChatGPT - you can also enable notifications too. Feel free to use our cdk example on how to implement Slack Notifications. https://github.com/ZDF-OSS/aws-slack-notifications
+      snsNotificationArn: 'arn:aws:sns:eu-central-1:326941568664:notifications-to-channel',
     });
   }
 }

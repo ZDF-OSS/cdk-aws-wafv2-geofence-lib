@@ -10,6 +10,8 @@ new CdkWafGeoLib(stack, 'Cdk-Waf-Geo-Lib', {
   priority: 500,
   enableGeoBlocking: true,
   enableAWSManagedRulesBlocking: false,
+  enableChatGPTBlocking: true,
+  deployChatGPTBlocking: true,
 });
 const template = Template.fromStack(stack);
 
