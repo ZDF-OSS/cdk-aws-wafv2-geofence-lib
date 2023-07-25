@@ -76,7 +76,7 @@ export class ChatGPTWafLogEvaluation extends Construct {
     const waf_log_analysis_lambda = new lambda.Function(this, 'waf-log-check-lambda', {
       runtime: lambda.Runtime.PYTHON_3_10,
       code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'lambda', 'log_analytics.zip')),
-      handler: 'log_analytics.handler',
+      handler: 'index.handler',
       role: waf_log_checker_lambda_role,
       architecture: lambda.Architecture.ARM_64,
       //layers: [lambdaLayer],
