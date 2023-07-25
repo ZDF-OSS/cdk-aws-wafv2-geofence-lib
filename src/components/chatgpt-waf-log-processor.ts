@@ -1,11 +1,11 @@
+import { execSync } from 'child_process';
+import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-//import * as logs from 'aws-cdk-lib/aws-logs'
-//import * as cw from 'aws-cdk-lib/aws-cloudwatch'
 import { Architecture } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
@@ -58,7 +58,21 @@ export class ChatGPTWafLogProcessor extends Construct {
     );
     const waf_log_processor_lambda = new lambda.Function(this, 'waf-log-process-lambda', {
       runtime: lambda.Runtime.PYTHON_3_10,
-      code: lambda.Code.fromAsset('./src/components/lambda/chatgpt_result_processor.zip', {
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src', 'components', 'lambda', 'chatgpt_result_processor'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_10.bundlingImage,
+          local: {
+            tryBundle(outputDir: string) {
+              execSync(`pip3 install -r ${path.join(__dirname, '..', 'src', 'components', 'lambda', 'chatgpt_result_processor', 'requirements.txt')} -t ${outputDir}`);
+              execSync(`cp -au ${path.join(__dirname, '..', 'src', 'components', 'lambda', 'chatgpt_result_processor')} ${outputDir}`);
+              return true;
+            },
+          },
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output',
+          ],
+        },
       }),
       handler: 'result_processor.handler',
       role: waf_log_processor_lambda_role,
