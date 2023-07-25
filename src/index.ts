@@ -155,7 +155,7 @@ export class CdkWafGeoLib extends Construct {
 
     if (props.enableCloudWatchLogs) {
       // Create logging configuration with log group as destination
-      new CfnLoggingConfiguration(scope, 'webAclLoggingConfiguration', {
+      const log_config = new CfnLoggingConfiguration(scope, 'webAclLoggingConfiguration', {
         logDestinationConfigs: [
           cdk.Stack.of(this).formatArn({
             arnFormat: cdk.ArnFormat.COLON_RESOURCE_NAME,
@@ -166,7 +166,7 @@ export class CdkWafGeoLib extends Construct {
         ],
         resourceArn: cfnWebACL.attrArn,
       });
-
+      log_config.node.addDependency(log_group);
       new wafv2.CfnWebACLAssociation(this, 'WAFAssociation', {
         resourceArn: props.resourceArn,
         webAclArn: cfnWebACL.attrArn,
