@@ -76,13 +76,13 @@ export class ChatGPTWafLogEvaluation extends Construct {
 
     const waf_log_analysis_lambda = new lambda.Function(this, 'waf-log-check-lambda', {
       runtime: lambda.Runtime.PYTHON_3_10,
-      code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src', 'components', 'lambda', 'log_analytics'), {
+      code: lambda.Code.fromAsset(path.join(__dirname, 'lambda', 'log_analytics'), {
         bundling: {
           image: lambda.Runtime.PYTHON_3_10.bundlingImage,
           local: {
             tryBundle(outputDir: string) {
-              execSync(`pip3 install -r ${path.join(__dirname, '..', 'src', 'components', 'lambda', 'log_analytics', 'requirements.txt')} -t ${outputDir}`);
-              execSync(`cp -au ${path.join(__dirname, '..', 'src', 'components', 'lambda', 'log_analytics')} ${outputDir}`);
+              execSync(`pip3 install -r ${path.join(__dirname, 'lambda', 'log_analytics', 'requirements.txt')} -t ${outputDir}`);
+              execSync(`cp -au ${path.join(__dirname, 'lambda', 'log_analytics')} ${outputDir}`);
               return true;
             },
           },
@@ -92,7 +92,7 @@ export class ChatGPTWafLogEvaluation extends Construct {
           ],
         },
       }),
-      handler: 'inspect_waf_logs.handler',
+      handler: 'index.handler',
       role: waf_log_checker_lambda_role,
       architecture: lambda.Architecture.ARM_64,
       //layers: [lambdaLayer],

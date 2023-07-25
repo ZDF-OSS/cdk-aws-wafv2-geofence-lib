@@ -21,5 +21,6 @@ const project = new awscdk.AwsCdkConstructLibrary({
   gitignore: [
     'cdk.out/',
   ],
+  bundledDeps: ['openai'],
 });
 project.synth();

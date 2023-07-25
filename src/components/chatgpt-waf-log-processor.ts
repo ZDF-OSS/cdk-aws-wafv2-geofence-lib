@@ -58,13 +58,13 @@ export class ChatGPTWafLogProcessor extends Construct {
     );
     const waf_log_processor_lambda = new lambda.Function(this, 'waf-log-process-lambda', {
       runtime: lambda.Runtime.PYTHON_3_10,
-      code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src', 'components', 'lambda', 'chatgpt_result_processor'), {
+      code: lambda.Code.fromAsset(path.join(__dirname, 'lambda', 'chatgpt_result_processor'), {
         bundling: {
           image: lambda.Runtime.PYTHON_3_10.bundlingImage,
           local: {
             tryBundle(outputDir: string) {
-              execSync(`pip3 install -r ${path.join(__dirname, '..', 'src', 'components', 'lambda', 'chatgpt_result_processor', 'requirements.txt')} -t ${outputDir}`);
-              execSync(`cp -au ${path.join(__dirname, '..', 'src', 'components', 'lambda', 'chatgpt_result_processor')} ${outputDir}`);
+              execSync(`pip3 install -r ${path.join(__dirname, 'lambda', 'chatgpt_result_processor', 'requirements.txt')} -t ${outputDir}`);
+              execSync(`cp -au ${path.join(__dirname, 'lambda', 'chatgpt_result_processor')} ${outputDir}`);
               return true;
             },
           },
@@ -74,7 +74,7 @@ export class ChatGPTWafLogProcessor extends Construct {
           ],
         },
       }),
-      handler: 'result_processor.handler',
+      handler: 'index.handler',
       role: waf_log_processor_lambda_role,
       description:
           'Reads DynamoDB where IPs are listed by ChatBGP to block and blocks them bei syncing to an IPSet.',
