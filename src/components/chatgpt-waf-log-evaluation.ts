@@ -1,12 +1,11 @@
+import { execSync } from 'child_process';
+import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-//import * as logs from 'aws-cdk-lib/aws-logs'
-//import * as cw from 'aws-cdk-lib/aws-cloudwatch'
-//import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
 export interface IChatGPTWafLogEvaluationProps {
@@ -75,16 +74,23 @@ export class ChatGPTWafLogEvaluation extends Construct {
       );
     }
 
-    /*
-    const lambdaLayer = new lambda.LayerVersion(this, 'waf-log-check-layer', {
-      code: lambda.Code.fromAsset('./src/components/lambda/log_analytics_layer_layer.zip'),
-      compatibleRuntimes: [lambda.Runtime.PYTHON_3_10], // Adjust this based on your Lambda runtime
-      description: 'Python dependencies layer',
-    });*/
-
     const waf_log_analysis_lambda = new lambda.Function(this, 'waf-log-check-lambda', {
       runtime: lambda.Runtime.PYTHON_3_10,
-      code: lambda.Code.fromAsset('./src/components/lambda/log_analytics.zip', {
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', 'src', 'components', 'lambda', 'log_analytics'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_10.bundlingImage,
+          local: {
+            tryBundle(outputDir: string) {
+              execSync(`pip3 install -r ${path.join(__dirname, '..', 'src', 'components', 'lambda', 'log_analytics', 'requirements.txt')} -t ${outputDir}`);
+              execSync(`cp -au ${path.join(__dirname, '..', 'src', 'components', 'lambda', 'log_analytics')} ${outputDir}`);
+              return true;
+            },
+          },
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output',
+          ],
+        },
       }),
       handler: 'inspect_waf_logs.handler',
       role: waf_log_checker_lambda_role,
