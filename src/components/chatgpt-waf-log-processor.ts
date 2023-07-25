@@ -1,4 +1,3 @@
-import { execSync } from 'child_process';
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
@@ -58,23 +57,9 @@ export class ChatGPTWafLogProcessor extends Construct {
     );
     const waf_log_processor_lambda = new lambda.Function(this, 'waf-log-process-lambda', {
       runtime: lambda.Runtime.PYTHON_3_10,
-      code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'lambda', 'chatgpt_result_processor'), {
-        bundling: {
-          image: lambda.Runtime.PYTHON_3_10.bundlingImage,
-          local: {
-            tryBundle(outputDir: string) {
-              execSync(`pip3 install -r ${path.join(__dirname, '..', '..', 'lambda', 'chatgpt_result_processor', 'requirements.txt')} -t ${outputDir}`);
-              execSync(`cp -au ${path.join(__dirname, '..', '..', 'lambda', 'chatgpt_result_processor')} ${outputDir}`);
-              return true;
-            },
-          },
-          command: [
-            'bash', '-c',
-            'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output',
-          ],
-        },
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'lambda', 'chatgpt_result_processor.zip'), {
       }),
-      handler: 'index.handler',
+      handler: 'chatgpt_result_processor.handler',
       role: waf_log_processor_lambda_role,
       description:
           'Reads DynamoDB where IPs are listed by ChatBGP to block and blocks them bei syncing to an IPSet.',

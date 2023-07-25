@@ -1,4 +1,3 @@
-import { execSync } from 'child_process';
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
@@ -76,23 +75,8 @@ export class ChatGPTWafLogEvaluation extends Construct {
 
     const waf_log_analysis_lambda = new lambda.Function(this, 'waf-log-check-lambda', {
       runtime: lambda.Runtime.PYTHON_3_10,
-      code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'lambda', 'log_analytics'), {
-        bundling: {
-          image: lambda.Runtime.PYTHON_3_10.bundlingImage,
-          local: {
-            tryBundle(outputDir: string) {
-              execSync(`pip3 install -r ${path.join(__dirname, '..', '..', 'lambda', 'log_analytics', 'requirements.txt')} -t ${outputDir}`);
-              execSync(`cp -au ${path.join(__dirname, '..', '..', 'lambda', 'log_analytics')} ${outputDir}`);
-              return true;
-            },
-          },
-          command: [
-            'bash', '-c',
-            'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output',
-          ],
-        },
-      }),
-      handler: 'index.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'lambda', 'log_analytics.zip')),
+      handler: 'log_analytics.handler',
       role: waf_log_checker_lambda_role,
       architecture: lambda.Architecture.ARM_64,
       //layers: [lambdaLayer],
