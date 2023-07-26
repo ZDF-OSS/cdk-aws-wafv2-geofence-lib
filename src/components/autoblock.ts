@@ -23,7 +23,7 @@ export class AutoBlock extends Construct {
       scope=this, 'waf-chatgpt-ipblock', {
         addresses: [],
         ipAddressVersion: 'IPV4',
-        name: 'waf_ips_managed_by_chatgpt',
+        name: 'BadIPs',
         scope: this.rule_scope,
         description: 'ChatGPT managed IPSet.',
       },

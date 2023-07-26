@@ -60,6 +60,7 @@ export class ChatGPTWafLogProcessor extends Construct {
       code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'lambda', 'chatgpt_result_processor.zip'), {
       }),
       handler: 'index.handler',
+      memorySize: 160,
       role: waf_log_processor_lambda_role,
       description:
           'Reads DynamoDB where IPs are listed by ChatBGP to block and blocks them bei syncing to an IPSet.',
