@@ -78,6 +78,7 @@ export class ChatGPTWafLogEvaluation extends Construct {
       code: lambda.Code.fromAsset(path.join(__dirname, '..', '..', 'lambda', 'log_analytics.zip')),
       handler: 'index.handler',
       role: waf_log_checker_lambda_role,
+      memorySize: 160,
       architecture: lambda.Architecture.ARM_64,
       //layers: [lambdaLayer],
       description:
