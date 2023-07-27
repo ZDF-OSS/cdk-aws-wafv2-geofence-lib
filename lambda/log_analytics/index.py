@@ -1,9 +1,11 @@
 import os
 import time
-from datetime import datetime, timedelta
-from dataclasses import dataclass
 import openai
 import boto3
+from datetime import datetime, timedelta
+from dataclasses import dataclass
+from string import Template
+
 
 logs = boto3.client("logs")
 cw = boto3.client("cloudwatch")
@@ -17,6 +19,7 @@ SCOPE = os.getenv("SCOPE")
 LOG_GROUP = os.getenv("LOG_GROUP")
 LAST_LOG_MINUTES = os.getenv("LAST_LOG_MINUTES")
 SNS_ARN = os.environ.get("SNS_ARN", '')
+ADMIN_URI = os.get('ADMIN_URI', '')
 
 client = boto3.client('secretsmanager')
 openai.api_key = sm.get_secret_value(
@@ -190,11 +193,16 @@ def GetCallsFromIP(ip):
 
 
 def AskChatGPTAboutTheUris(uris):
-    question = f"""Can this requests to my web app be part of an attack? Give an brief explanation and respond with #YES# or #NO# if this should be blocked. These are the uri calls: {uris}"""
+    question = f"""Can this requests to my web app be part of an attack? Give an brief explanation and respond with #YES# or #NO# if this should be blocked. $admin These are the uri calls: {uris}"""
+    if len(ADMIN_URI) > 0:
+        template = Template(question)
+        template.substitute({'admin': ADMIN_URI})
+        question = template
+    else:
+        question = question.replace(' $admin', '')
 
     print(f"Checking: {uris}")
-    answer = ask_chatgpt(question)
-    return answer
+    return ask_chatgpt(question)
 
 
 def make_message(item: Item):

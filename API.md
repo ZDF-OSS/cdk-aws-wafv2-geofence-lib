@@ -443,6 +443,7 @@ public readonly customResourceResult: string;
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableGeoBlocking">enableGeoBlocking</a></code> | <code>boolean</code> | Switch to control if the rule should block or count incomming requests. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.priority">priority</a></code> | <code>number</code> | Priority of the WAFv2 rule. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.resourceArn">resourceArn</a></code> | <code>string</code> | Arn of the ressource to protect. |
+| <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.adminUri">adminUri</a></code> | <code>string</code> | Admin Uri that should be respected by the waf to improve accuracy. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.block">block</a></code> | <code>boolean</code> | Deprecated: -  use enableGeoBlocking Switch to control if the rule should block or count incomming requests. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.cloudWatchLogGroupName">cloudWatchLogGroupName</a></code> | <code>string</code> | Name of the CloudWatch LogGroup where requests are stored. |
 | <code><a href="#cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.enableAWSManagedRuleCRS">enableAWSManagedRuleCRS</a></code> | <code>boolean</code> | The Core rule set (CRS) rule group contains rules that are generally applicable to web applications. |
@@ -543,6 +544,18 @@ public readonly resourceArn: string;
 - *Type:* string
 
 Arn of the ressource to protect.
+
+---
+
+##### `adminUri`<sup>Optional</sup> <a name="adminUri" id="cdk-aws-wafv2-geofence-lib.ICdkWafGeoLibProps.property.adminUri"></a>
+
+```typescript
+public readonly adminUri: string;
+```
+
+- *Type:* string
+
+Admin Uri that should be respected by the waf to improve accuracy.
 
 ---
 

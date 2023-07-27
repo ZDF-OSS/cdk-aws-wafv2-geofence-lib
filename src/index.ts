@@ -35,6 +35,8 @@ export interface ICdkWafGeoLibProps {
   deployChatGPTBlocking: boolean;
   /** Deploy ChatGPT blocking infrastructure e.g. DynamoDB, Lambdas, CW Rules. */
   enableChatGPTBlocking: boolean;
+  /** Admin Uri that should be respected by the waf to improve accuracy  */
+  adminUri?: string;
   /** SNS Topic Arn of for sending notifications about ChatGPT Blocking results. */
   snsNotificationArn?: string;
   /** Switch to control if the rule should block or count incomming requests hitting the AWS Manged Rules. */
@@ -116,6 +118,7 @@ export class CdkWafGeoLib extends Construct {
         rule_scope: 'REGIONAL',
         log_group: log_group.logGroupName,
         chatgpt_log_check_intervall_minutes: 10,
+        adminUri: props.adminUri ? props.adminUri : '',
         notification_sns_arn: props.snsNotificationArn ? props.snsNotificationArn : '',
       });
 

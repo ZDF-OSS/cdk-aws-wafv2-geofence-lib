@@ -11,6 +11,7 @@ export interface IChatGPTWafLogEvaluationProps {
   rule_scope: string;
   log_group: string;
   chatgpt_log_check_intervall_minutes: number;
+  adminUri: string;
   notification_sns_arn: string;
 }
 
@@ -87,6 +88,7 @@ export class ChatGPTWafLogEvaluation extends Construct {
         PRODUCT: 'ChatGPTBadIPs',
         DB_NAME: table.tableName,
         SCOPE: this.rule_scope,
+        ADMIN_URI: props.adminUri,
         LOG_GROUP: this.log_group,
         SNS_ARN: props.notification_sns_arn,
         SECRET_ID: chatGPTAPISecret.secretName,
