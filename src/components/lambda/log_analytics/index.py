@@ -112,12 +112,12 @@ def ask_chatgpt(question):
 
     # Generate a response from ChatGPT
     response = openai.Completion.create(
-        engine='text-davinci-003',
+        engine='gpt-4',
         prompt=prompt,
         max_tokens=150,
         n=1,
         stop=None,
-        temperature=0.7,
+        temperature=0.3,
     )
 
     # Extract the answer from the response
@@ -190,7 +190,8 @@ def GetCallsFromIP(ip):
 
 
 def AskChatGPTAboutTheUris(uris):
-    question = f"""Can this requests to my web app be part of an attack? Give an brief explanation and respond with #YES# or #NO# if this should be blocked. These are the uri calls: {uris}"""
+    question = f"""Can this requests to my web app be part of an attack? Give an brief explanation and respond with #YES# or #NO# if this should be blocked. These are the uri calls: {
+        uris}"""
 
     print(f"Checking: {uris}")
     answer = ask_chatgpt(question)
