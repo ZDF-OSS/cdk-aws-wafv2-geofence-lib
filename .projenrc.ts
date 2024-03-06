@@ -7,11 +7,11 @@ const PROJECT_DESCRIPTION =
 const project = new awscdk.AwsCdkConstructLibrary({
   author: 'ZeroDotFive',
   authorAddress: 'ayoub.umoru@zerodotfive.com',
-  cdkVersion: '2.84.0',
+  cdkVersion: '2.127.0',
   majorVersion: 1,
   defaultReleaseBranch: 'main',
   authorOrganization: true,
-  jsiiVersion: '~5.0.0',
+  jsiiVersion: '~5.3.0',
   name: PROJECT_NAME,
   projenrcTs: true,
   repositoryUrl: 'https://github.com/ZDF-OSS/cdk-aws-wafv2-geofence-lib.git',
