@@ -112,7 +112,7 @@ export class EcsBpMicroserviceWaf extends cdk.Stack {
       deployChatGPTBlocking: true,
 
       //Notifications
-      snsNotificationArn: 'arn:aws:sns:eu-central-1:126941568664:notifications-to-channel',
+      snsNotificationArn: 'arn:aws:sns:eu-central-1:326941568664:notifications-to-channel',
     });
   }
 }
