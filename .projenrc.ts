@@ -1,8 +1,4 @@
 import { awscdk } from "projen";
-project.github?.actions.set(
-  "actions/upload-artifact",
-  "actions/upload-artifact@v4.3.6"
-);
 
 const PROJECT_NAME = "cdk-aws-wafv2-geofence-lib";
 const PROJECT_DESCRIPTION =
@@ -34,4 +30,10 @@ const project = new awscdk.AwsCdkConstructLibrary({
   gitignore: ["cdk.out/"],
   bundledDeps: ["openai"],
 });
+
+project.github?.actions.set(
+  "actions/upload-artifact",
+  "actions/upload-artifact@v4.3.6"
+);
+
 project.synth();
